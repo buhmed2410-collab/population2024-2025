@@ -35,26 +35,28 @@ import {
   Activity,
   UserCheck,
   HeartPulse,
-  LineChart as LineChartIcon
+  Globe,
+  PieChart as PieChartIcon,
+  BarChart as BarChartIcon
 } from 'lucide-react';
 
 // --- Icons & Decorative Elements ---
 
 const KhanjarIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]">
-    <path d="M50 10C50 10 35 30 35 50C35 70 50 90 50 90C50 90 65 70 65 50C65 30 50 10 50 10Z" fill="none" stroke="#22d3ee" strokeWidth="3"/>
-    <path d="M40 35H60M42 45H58M45 55H55" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round"/>
-    <path d="M50 10V90" stroke="#22d3ee" strokeWidth="1" strokeDasharray="4 4" opacity="0.5"/>
+  <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_8px_var(--brand-primary)] opacity-80">
+    <path d="M50 10C50 10 35 30 35 50C35 70 50 90 50 90C50 90 65 70 65 50C65 30 50 10 50 10Z" fill="none" stroke="var(--brand-primary)" strokeWidth="3"/>
+    <path d="M40 35H60M42 45H58M45 55H55" stroke="var(--brand-primary)" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M50 10V90" stroke="var(--brand-primary)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5"/>
   </svg>
 );
 
 const LubanTreeIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]">
-    <path d="M50 90V60M50 60L30 40M50 60L70 40M50 50L50 30" stroke="#22d3ee" strokeWidth="4" strokeLinecap="round"/>
-    <circle cx="30" cy="40" r="8" fill="#0891b2" />
-    <circle cx="70" cy="40" r="8" fill="#0891b2" />
-    <circle cx="50" cy="30" r="10" fill="#0891b2" />
-    <circle cx="50" cy="15" r="6" fill="#0891b2" />
+  <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_8px_var(--brand-primary)] opacity-80">
+    <path d="M50 90V60M50 60L30 40M50 60L70 40M50 50L50 30" stroke="var(--brand-primary)" strokeWidth="4" strokeLinecap="round"/>
+    <circle cx="30" cy="40" r="8" fill="var(--brand-accent)" />
+    <circle cx="70" cy="40" r="8" fill="var(--brand-accent)" />
+    <circle cx="50" cy="30" r="10" fill="var(--brand-accent)" />
+    <circle cx="50" cy="15" r="6" fill="var(--brand-accent)" />
   </svg>
 );
 
@@ -260,6 +262,7 @@ const StatCard = ({ title, value, subValue, icon: Icon, trend, color }) => (
 );
 
 export default function App() {
+  const [theme, setTheme] = useState('original');
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedYear, setSelectedYear] = useState('2025');
   const [selectedWilayatAge, setSelectedWilayatAge] = useState('all');
@@ -416,62 +419,79 @@ export default function App() {
   const COLORS = ['#00e5ff', '#ffea00', '#003b4d', '#4fc3f7'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#002b36] via-[#004b5c] to-[#006b80] text-white font-sans p-6 md:p-10" dir="rtl">
+    <div className="theme-container theme-transition relative p-4 md:p-10 font-sans" dir="rtl" data-theme={theme}>
       {/* Decorative Background Pattern */}
-      <div className="fixed inset-0 opacity-[0.03] pointer-events-none z-0" 
-           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%2322d3ee' fill-rule='evenodd'/%3E%3C/svg%3E")` }}>
+      <div className="fixed inset-0 opacity-[0.05] pointer-events-none z-0" 
+           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='var(--brand-primary)' fill-rule='evenodd'/%3E%3C/svg%3E")` }}>
       </div>
 
       {/* Header */}
-      <header className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6 border-bottom border-cyan-500/30 pb-6 mb-8 border-b">
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <div className="font-bold text-cyan-400 text-sm leading-tight drop-shadow-[0_0_5px_rgba(34,211,238,0.3)]">المديرية العامة للخدمات الصحية</div>
-            <div className="font-bold text-cyan-400 text-sm leading-tight mb-1">بمحافظة ظفار</div>
-            <div className="text-[11px] text-cyan-300/70 font-bold">دائرة التخطيط والتنظيم الصحي</div>
-            <div className="text-[10px] text-cyan-300/50 font-bold">إدارة المعلومات الصحية</div>
+      <header className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6 border-b border-[var(--border-ui)] pb-8 mb-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <div className="font-black text-[var(--brand-primary)] text-sm leading-tight">المديرية العامة للخدمات الصحية</div>
+              <div className="font-black text-[var(--brand-primary)] text-sm leading-tight mb-1">بمحافظة ظفار</div>
+              <div className="text-[11px] text-[var(--text-muted)] font-bold">دائرة التخطيط والتنظيم الصحي</div>
+            </div>
+          </div>
+          
+          <div className="flex gap-2 p-1 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-ui)]">
+            {['original', 'royal', 'health', 'night'].map((t) => (
+              <button
+                key={t}
+                onClick={() => setTheme(t)}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                  theme === t 
+                    ? 'bg-[var(--brand-primary)] text-white shadow-md' 
+                    : 'text-[var(--text-muted)] hover:bg-[var(--bg-card)]'
+                }`}
+              >
+                {t === 'original' ? 'الأساسي' : t === 'royal' ? 'تراثي' : t === 'health' ? 'عصري' : 'ليلي'}
+              </button>
+            ))}
           </div>
         </div>
         
         <div className="text-center flex-grow">
-          <h1 className="text-3xl font-bold text-cyan-400 tracking-wide m-0 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">التعداد السكاني لمحافظة ظفار</h1>
-          <h2 className="text-lg text-cyan-300 opacity-90 m-0 drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">مقارنة تحليلية (2024 - 2025)</h2>
+          <h1 className={`${theme === 'royal' ? 'font-serif' : 'font-sans'} text-3xl md:text-4xl font-black text-[var(--brand-primary)] tracking-tight m-0 drop-shadow-sm`}>تعداد سكان محافظة ظفار</h1>
+          <h2 className="text-lg text-[var(--text-muted)] font-bold m-0 opacity-80">مقارنة تحليلية شاملة (2024 - 2025)</h2>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="text-left">
-            <div className="font-bold text-cyan-400/80 text-[11px] leading-tight drop-shadow-[0_0_5px_rgba(34,211,238,0.3)]">Directorate General of Health Services</div>
-            <div className="font-bold text-cyan-400/80 text-[11px] leading-tight mb-1">Dhofar Governorate</div>
-            <div className="text-[10px] text-cyan-400/50 font-bold">Health Planning and Organization Department</div>
-            <div className="text-[9px] text-cyan-400/30 font-bold">Health Information Management</div>
+            <div className="font-bold text-[var(--brand-primary)] text-[11px] leading-tight opacity-80">Directorate General of Health Services</div>
+            <div className="font-bold text-[var(--brand-primary)] text-[11px] leading-tight mb-1 opacity-80">Dhofar Governorate</div>
+            <div className="text-[10px] text-[var(--text-muted)] font-semibold">Health Planning & Organization</div>
           </div>
+          <LubanTreeIcon />
         </div>
       </header>
 
       <main className="relative z-10 max-w-7xl mx-auto">
         {/* Navigation Tabs */}
-        <div className="flex gap-4 mb-8 overflow-x-auto pb-2 no-scrollbar justify-center">
+        <nav className="relative z-10 flex flex-wrap justify-center mb-10 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-ui)] gap-1 shadow-sm max-w-4xl mx-auto">
           {[
-            { id: 'overview', label: 'نظرة عامة', icon: Activity },
-            { id: 'wilayats', label: 'توزيع الولايات', icon: MapPin },
-            { id: 'composition', label: 'تركيبة السكان', icon: UserCheck },
-            { id: 'gender', label: 'توزيع النوع', icon: Users },
-            { id: 'age', label: 'الفئات العمرية', icon: TrendingUp },
-          ].map((tab) => (
+            { id: 'overview', label: 'التقرير الشامل', icon: <PieChartIcon size={18} /> },
+            { id: 'wilayats', label: 'توزيع الولايات', icon: <MapPin size={18} /> },
+            { id: 'age', label: 'الفئات العمرية', icon: <BarChartIcon size={18} /> },
+            { id: 'gender', label: 'توزيع النوع', icon: <Users size={18} /> },
+            { id: 'composition', label: 'تركيبة السكان', icon: <Globe size={18} /> },
+          ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-8 py-2 rounded-full font-bold transition-all border-2 ${
+              className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 ${
                 activeTab === tab.id 
-                ? 'bg-[#8B0000] text-white border-[#8B0000] shadow-[0_0_15px_rgba(139,0,0,0.4)] scale-105' 
-                : 'bg-cyan-100 text-[#8B0000] border-[#8B0000]/20 hover:bg-cyan-200'
+                  ? 'bg-[var(--brand-primary)] text-white shadow-lg scale-105' 
+                  : 'text-[var(--text-muted)] hover:bg-[var(--bg-card)]'
               }`}
             >
-              <tab.icon size={18} />
+              {tab.icon}
               {tab.label}
             </button>
           ))}
-        </div>
+        </nav>
 
         <AnimatePresence mode="wait">
           {activeTab === 'overview' && (
@@ -483,57 +503,55 @@ export default function App() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-6"
             >
               <div className="flex flex-col gap-6">
-                <div className="card-polish p-6 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                  <span className="stat-label-polish text-[#8B0000]">إجمالي السكان 2024</span>
-                  <span className="stat-value-polish block my-2 text-[#8B0000]">{DATA_2024.total.toLocaleString()}</span>
-                  <span className="text-xs text-[#8B0000]/60">نسمة</span>
+                <div className="card-polish p-6 card-shadow border-t-4 border-t-[var(--brand-primary)]">
+                  <span className="stat-label-polish">إجمالي السكان 2024</span>
+                  <span className="stat-value-polish block my-2">{DATA_2024.total.toLocaleString()}</span>
+                  <span className="text-xs text-[var(--text-muted)]">نسمة</span>
                 </div>
-                <div className="card-polish p-6 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                  <span className="stat-label-polish text-[#8B0000]">إجمالي السكان 2025</span>
-                  <span className="stat-value-polish block my-2 text-[#8B0000]">{DATA_2025.total.toLocaleString()}</span>
-                  <span className="text-xs text-[#8B0000]/60">نسمة</span>
+                <div className="card-polish p-6 card-shadow border-t-4 border-t-[var(--brand-primary)]">
+                  <span className="stat-label-polish">إجمالي السكان 2025</span>
+                  <span className="stat-value-polish block my-2">{DATA_2025.total.toLocaleString()}</span>
+                  <span className="text-xs text-[var(--text-muted)]">نسمة</span>
                 </div>
-                <div className="card-polish p-6 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                  <span className="stat-label-polish text-[#8B0000]">معدل النمو السنوي</span>
-                  <span className="stat-value-polish block my-2 text-red-600">0.55%</span>
-                  <span className="text-xs text-[#8B0000]/60">+{(DATA_2025.total - DATA_2024.total).toLocaleString()} نسمة</span>
+                <div className="card-polish p-6 card-shadow border-r-4 border-r-[var(--brand-accent)]">
+                  <span className="stat-label-polish">معدل النمو السنوي</span>
+                  <span className="stat-value-polish block my-2 text-green-600">0.55%</span>
+                  <span className="text-xs text-[var(--text-muted)]">+{(DATA_2025.total - DATA_2024.total).toLocaleString()} نسمة</span>
                 </div>
-                <div className="card-polish p-6 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                  <span className="stat-label-polish text-[#8B0000]">توزيع النوع (2024)</span>
-                  <div className="flex justify-between mt-2">
-                    <div>
-                      <span className="text-[10px] text-[#8B0000]/60 block">ذكور</span>
-                      <span className="font-bold text-blue-600 text-lg">{(347843).toLocaleString()}</span>
+                
+                <div className="card-polish p-6 card-shadow border-l-4 border-l-[var(--brand-primary)]">
+                  <span className="stat-label-polish block mb-4">توزيع النوع (2025)</span>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-[var(--text-muted)] font-black">ذكور</span>
+                      <div className="flex items-center gap-3">
+                        <span className="font-black text-blue-600 text-xl">{(342726).toLocaleString()}</span>
+                        <div className="h-2 flex-grow bg-[var(--bg-surface)] rounded-full overflow-hidden">
+                          <div className="h-full bg-blue-600" style={{ width: '64%' }}></div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <span className="text-[10px] text-[#8B0000]/60 block">إناث</span>
-                      <span className="font-bold text-red-800 text-lg">{(181782).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="card-polish p-6 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                  <span className="stat-label-polish text-[#8B0000]">توزيع النوع (2025)</span>
-                  <div className="flex justify-between mt-2">
-                    <div>
-                      <span className="text-[10px] text-[#8B0000]/60 block">ذكور</span>
-                      <span className="font-bold text-blue-600 text-lg">{(342726).toLocaleString()}</span>
-                    </div>
-                    <div className="text-left">
-                      <span className="text-[10px] text-[#8B0000]/60 block">إناث</span>
-                      <span className="font-bold text-red-800 text-lg">{(189793).toLocaleString()}</span>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-[var(--text-muted)] font-black">إناث</span>
+                      <div className="flex items-center gap-3">
+                        <span className="font-black text-red-700 text-xl">{(189793).toLocaleString()}</span>
+                        <div className="h-2 flex-grow bg-[var(--bg-surface)] rounded-full overflow-hidden">
+                          <div className="h-full bg-red-700" style={{ width: '36%' }}></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="card-polish p-6 flex flex-col bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                <span className="stat-label-polish text-[#8B0000] font-bold text-base border-b border-[#8B0000]/10 pb-2 mb-4">التوزيع النسبي حسب الجنسية</span>
+              <div className="card-polish p-6 flex flex-col card-shadow">
+                <span className="stat-label-polish border-b border-[var(--border-ui)] pb-2 mb-4">التوزيع النسبي حسب الجنسية</span>
                 
                 <div className="flex flex-col gap-8 flex-grow">
                   {/* 2024 Distribution */}
                   <div>
-                    <span className="text-xs font-bold text-[#8B0000]/70 mb-2 block">سنة 2024</span>
-                    <div className="w-full h-10 bg-white rounded-xl overflow-hidden flex border-2 border-[#8B0000]/20 shadow-md mb-2">
+                    <span className="text-xs font-bold text-[var(--text-muted)] mb-2 block">سنة 2024</span>
+                    <div className="w-full h-10 bg-[var(--bg-surface)] rounded-xl overflow-hidden flex border-2 border-[var(--border-ui)] shadow-md mb-2">
                       <div className="h-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-black border-l border-blue-800" style={{ width: `${(DATA_2024.omani / DATA_2024.total * 100).toFixed(1)}%` }}>
                         {(DATA_2024.omani / DATA_2024.total * 100).toFixed(1)}%
                       </div>
@@ -545,8 +563,8 @@ export default function App() {
 
                   {/* 2025 Distribution */}
                   <div>
-                    <span className="text-xs font-bold text-[#8B0000]/70 mb-2 block">سنة 2025</span>
-                    <div className="w-full h-10 bg-white rounded-xl overflow-hidden flex border-2 border-[#8B0000]/20 shadow-md mb-2">
+                    <span className="text-xs font-bold text-[var(--text-muted)] mb-2 block">سنة 2025</span>
+                    <div className="w-full h-10 bg-[var(--bg-surface)] rounded-xl overflow-hidden flex border-2 border-[var(--border-ui)] shadow-md mb-2">
                       <div className="h-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-black border-l border-blue-800" style={{ width: `${(DATA_2025.omani / DATA_2025.total * 100).toFixed(1)}%` }}>
                         {(DATA_2025.omani / DATA_2025.total * 100).toFixed(1)}%
                       </div>
@@ -556,7 +574,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between text-xs font-black text-[#8B0000]">
+                  <div className="flex justify-between text-xs font-black text-[var(--text-main)]">
                     <span className="bg-blue-100/50 px-3 py-1 rounded-lg border border-blue-400 flex items-center gap-2">
                        <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>
                        <span>عمانيون</span>
@@ -567,11 +585,11 @@ export default function App() {
                     </span>
                   </div>
                   
-                  <div className="mt-4 border-t border-[#8B0000]/10 pt-4">
-                    <span className="stat-label-polish block mb-3 text-[#8B0000]">أهم الولايات (نمو)</span>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-[#8B0000]/80">
+                  <div className="mt-4 border-t border-[var(--border-ui)] pt-4">
+                    <span className="stat-label-polish block mb-3">أهم الولايات (نمو)</span>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-[var(--text-muted)]">
                       {wilayatComparison.slice(0, 6).map(w => (
-                        <div key={w.name} className="flex justify-between border-b border-dashed border-[#8B0000]/10 pb-0.5">
+                        <div key={w.name} className="flex justify-between border-b border-dashed border-[var(--border-ui)] pb-0.5">
                           <span>{w.name}:</span>
                           <span className="font-bold text-red-700">{w.growth}%</span>
                         </div>
@@ -581,16 +599,16 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="card-polish p-6 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                <span className="stat-label-polish text-[#8B0000]">تحليل النمو والفرق الجوهري</span>
+              <div className="card-polish p-6 card-shadow">
+                <span className="stat-label-polish border-b border-[var(--border-ui)] pb-2 mb-4 block">تحليل النمو والفرق الجوهري</span>
                 <div className="h-[200px] mt-4">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={comparisonData.slice(0, 1)} margin={{ top: 25, right: 30, left: 20, bottom: 5 }}>
                       <XAxis dataKey="name" hide />
                       <YAxis hide />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', border: '2px solid #8B0000', borderRadius: '12px', fontWeight: 'bold' }}
-                        itemStyle={{ color: '#8B0000', fontSize: '14px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
+                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
                         formatter={(value) => [value?.toLocaleString() ?? '0', 'نسمة']} 
                       />
                       <Bar 
@@ -600,7 +618,7 @@ export default function App() {
                         strokeWidth={2}
                         radius={[6, 6, 0, 0]} 
                         barSize={70} 
-                        label={{ position: 'top', fill: '#8B0000', fontSize: 14, fontWeight: '900', offset: 10 }} 
+                        label={{ position: 'top', fill: 'var(--brand-primary)', fontSize: 14, fontWeight: '900', offset: 10 }} 
                       />
                       <Bar 
                         dataKey="2025" 
@@ -609,18 +627,17 @@ export default function App() {
                         strokeWidth={2}
                         radius={[6, 6, 0, 0]} 
                         barSize={70} 
-                        label={{ position: 'top', fill: '#8B0000', fontSize: 14, fontWeight: '900', offset: 10 }} 
+                        label={{ position: 'top', fill: 'var(--brand-primary)', fontSize: 14, fontWeight: '900', offset: 10 }} 
                       />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-6 bg-white/40 p-4 rounded-xl border border-[#8B0000]/10">
-                  <h3 className="text-[#8B0000] font-bold text-lg mb-2">أبرز الفروقات والنتائج:</h3>
-                  <ul className="text-sm space-y-2 list-disc pr-4 leading-relaxed text-[#8B0000]/80">
+                <div className="mt-6 bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
+                  <h3 className="text-[var(--brand-primary)] font-bold text-lg mb-2">أبرز الفروقات والنتائج:</h3>
+                  <ul className="text-sm space-y-2 list-disc pr-4 leading-relaxed text-[var(--text-muted)]">
                     <li>زيادة ملحوظة في الفئة العمرية (15-35) بنسبة 5%.</li>
                     <li>توسع في الكثافة السكانية بمركز مدينة صلالة.</li>
                     <li>ارتفاع نسبة المواطنين العمانيين في المحافظة.</li>
-                    <li>تحسن في توزيع الخدمات الصحية لمواكبة الزيادة.</li>
                   </ul>
                 </div>
               </div>
@@ -635,54 +652,54 @@ export default function App() {
               exit={{ opacity: 0, x: -10 }}
               className="space-y-6"
             >
-              <div className="card-polish p-8 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg">
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[#8B0000]/10 pb-4 gap-4">
+              <div className="card-polish p-8 card-shadow">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xl font-bold text-[#8B0000]">توزيع السكان حسب الولايات ({selectedYear})</h3>
-                    <p className="text-[10px] text-[#8B0000]/60 font-bold">
+                    <h3 className="text-xl font-black text-[var(--brand-primary)]">توزيع السكان حسب الولايات ({selectedYear})</h3>
+                    <p className="text-[10px] text-[var(--text-muted)] font-black">
                        {selectedNatAge === 'omani' ? 'عمانيون' : selectedNatAge === 'expat' ? 'وافدون' : 'إجمالي'} | {selectedGenderAge === 'male' ? 'ذكور' : selectedGenderAge === 'female' ? 'إناث' : 'الكل'}
                     </p>
                   </div>
 
                   <div className="flex flex-wrap justify-center gap-4">
                     {/* Gender Filter */}
-                    <div className="flex bg-rose-50 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedGenderAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >الكل</button>
                       <button 
                         onClick={() => setSelectedGenderAge('male')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'male' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >ذكور</button>
                       <button 
                         onClick={() => setSelectedGenderAge('female')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'female' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >إناث</button>
                     </div>
 
                     {/* Nationality Filter */}
-                    <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedNatAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >إجمالي</button>
                       <button 
                         onClick={() => setSelectedNatAge('omani')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'omani' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >عمانيون</button>
                       <button 
                         onClick={() => setSelectedNatAge('expat')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'expat' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >وافدون</button>
                     </div>
 
                     {/* Wilayat Filter */}
-                    <div className="flex bg-white/50 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <select 
                         value={selectedWilayatAge}
                         onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                        className="bg-transparent text-[#8B0000] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
+                        className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
                       >
                         <option value="all">كل الولايات</option>
                         {DATA_2025.wilayats.map(w => (
@@ -691,18 +708,18 @@ export default function App() {
                       </select>
                     </div>
 
-                    <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedYear('2024')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2024' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >2024</button>
                       <button 
                         onClick={() => setSelectedYear('2025')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2025' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >2025</button>
                       <button 
                         onClick={() => setSelectedYear('compare')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === 'compare' ? 'bg-red-700 text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >مقارنة</button>
                     </div>
                   </div>
@@ -716,27 +733,27 @@ export default function App() {
                       barCategoryGap="25%"
                       barGap={5}
                     >
-                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(139,0,0,0.2)" strokeWidth={1} />
-                      <XAxis type="number" tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 13 }} axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }} tickLine={{ stroke: '#8B0000', strokeWidth: 2 }} />
+                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
+                      <XAxis type="number" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} tickLine={{ stroke: 'var(--brand-primary)', strokeWidth: 2 }} />
                       <YAxis 
                         dataKey="name" 
                         type="category" 
                         orientation="right" 
-                        axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }}
+                        axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }}
                         tickLine={false} 
                         width={140} 
-                        tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 16, textAnchor: 'start' }} 
+                        tick={{ fill: 'var(--text-main)', fontWeight: '900', fontSize: 16, textAnchor: 'start' }} 
                       />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', border: '3px solid #8B0000', borderRadius: '8px', fontWeight: 'bold' }}
-                        itemStyle={{ color: '#8B0000', fontSize: '14px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
+                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
                         formatter={(value) => [value?.toLocaleString() ?? '0', 'نسمة']} 
                       />
                       {selectedYear === 'compare' ? (
                         <>
-                          <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: '#8B0000', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
-                          <Bar dataKey="2024" name="إجمالي 2024" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={1.5} radius={[0, 4, 4, 0]} barSize={20} label={{ position: 'right', fill: '#8B0000', fontSize: 11, fontWeight: '900', formatter: (v: any) => v.toLocaleString() }} />
-                          <Bar dataKey="2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1.5} radius={[0, 4, 4, 0]} barSize={20} label={{ position: 'right', fill: '#8B0000', fontSize: 11, fontWeight: '900', formatter: (v: any) => v.toLocaleString() }} />
+                          <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
+                          <Bar dataKey="2024" name="إجمالي 2024" fill="#94a3b8" stroke="#475569" strokeWidth={1.5} radius={[0, 4, 4, 0]} barSize={20} label={{ position: 'right', fill: 'var(--brand-primary)', fontSize: 11, fontWeight: '900', formatter: (v: any) => v.toLocaleString() }} />
+                          <Bar dataKey="2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1.5} radius={[0, 4, 4, 0]} barSize={20} label={{ position: 'right', fill: 'var(--brand-primary)', fontSize: 11, fontWeight: '900', formatter: (v: any) => v.toLocaleString() }} />
                         </>
                       ) : (
                         <Bar 
@@ -755,7 +772,7 @@ export default function App() {
                               <text 
                                 x={x - 20} 
                                 y={y + height / 2} 
-                                fill="#8B0000" 
+                                fill="var(--brand-primary)" 
                                 textAnchor="end" 
                                 dominantBaseline="middle" 
                                 fontWeight="900" 
@@ -780,55 +797,55 @@ export default function App() {
               key="composition"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="card-polish p-8 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg"
+              className="card-polish p-8 card-shadow"
             >
-              <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[#8B0000]/10 pb-4 gap-4">
+              <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-xl font-bold text-[#8B0000]">تركيبة السكان (عمانيون vs وافدون) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
-                  <p className="text-[10px] text-[#8B0000]/60 font-bold">
+                  <h3 className="text-xl font-black text-[var(--brand-primary)]">تركيبة السكان (عمانيون vs وافدون) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
+                  <p className="text-[10px] text-[var(--text-muted)] font-bold">
                     فلتر النوع الحالي: {selectedGenderAge === 'male' ? 'ذكور فقط' : selectedGenderAge === 'female' ? 'إناث فقط' : 'الكل'}
                   </p>
                 </div>
                 
                 <div className="flex flex-wrap justify-center gap-4">
                   {/* Gender Filter */}
-                  <div className="flex bg-rose-50 p-1 rounded-lg border border-[#8B0000]/10">
+                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                     <button 
                       onClick={() => setSelectedGenderAge('total')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >الكل</button>
                     <button 
                       onClick={() => setSelectedGenderAge('male')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'male' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >ذكور</button>
                     <button 
                       onClick={() => setSelectedGenderAge('female')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'female' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >إناث</button>
                   </div>
 
                   {/* Nationality Filter */}
-                  <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                     <button 
                       onClick={() => setSelectedNatAge('total')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >إجمالي</button>
                     <button 
                       onClick={() => setSelectedNatAge('omani')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'omani' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >عمانيون</button>
                     <button 
                       onClick={() => setSelectedNatAge('expat')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'expat' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >وافدون</button>
                   </div>
 
                   {/* Wilayat Filter */}
-                  <div className="flex bg-white/50 p-1 rounded-lg border border-[#8B0000]/10">
+                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                     <select 
                       value={selectedWilayatAge}
                       onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                      className="bg-transparent text-[#8B0000] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
+                      className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
                     >
                       <option value="all">كل الولايات</option>
                       {DATA_2025.wilayats.map(w => (
@@ -837,18 +854,18 @@ export default function App() {
                     </select>
                   </div>
 
-                  <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                     <button 
                       onClick={() => setSelectedYear('2024')}
-                      className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2024' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >2024</button>
                     <button 
                       onClick={() => setSelectedYear('2025')}
-                      className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2025' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >2025</button>
                     <button 
                       onClick={() => setSelectedYear('compare')}
-                      className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === 'compare' ? 'bg-red-700 text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                      className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                     >مقارنة</button>
                   </div>
                 </div>
@@ -860,15 +877,15 @@ export default function App() {
                     data={wilayatComparison}
                     margin={{ top: 20, right: 180, left: 150, bottom: 20 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(139,0,0,0.2)" strokeWidth={1} />
-                    <XAxis type="number" tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 13 }} axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }} />
-                    <YAxis dataKey="name" type="category" orientation="right" width={140} axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }} tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 16, textAnchor: 'start' }} />
+                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
+                    <XAxis type="number" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                    <YAxis dataKey="name" type="category" orientation="right" width={140} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} tick={{ fill: 'var(--text-main)', fontWeight: '900', fontSize: 16, textAnchor: 'start' }} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#fff', border: '3px solid #8B0000', borderRadius: '8px', fontWeight: 'bold' }}
-                      itemStyle={{ color: '#8B0000', fontSize: '14px' }}
+                      contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
+                      itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
                       formatter={(value) => value?.toLocaleString() ?? '0'} 
                     />
-                    <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: '#8B0000', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
+                    <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
                     {selectedYear === 'compare' ? (
                       <>
                         <Bar dataKey="omani_2024" name="عمانيون 2024" stackId="2024" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={1} />
@@ -893,55 +910,55 @@ export default function App() {
                 key="gender"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card-polish p-8 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg"
+                className="card-polish p-8 card-shadow"
               >
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[#8B0000]/10 pb-4 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xl font-bold text-[#8B0000]">توزيع النوع الاجتماعي (ذكور vs إناث) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
-                    <p className="text-[10px] text-[#8B0000]/60 font-bold">
+                    <h3 className="text-xl font-black text-[var(--brand-primary)]">توزيع النوع الاجتماعي (ذكور vs إناث) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
+                    <p className="text-[10px] text-[var(--text-muted)] font-bold">
                       فلتر الجنسية الحالي: {selectedNatAge === 'omani' ? 'عمانيون فقط' : selectedNatAge === 'expat' ? 'وافدون فقط' : 'الكل'}
                     </p>
                   </div>
                   
                   <div className="flex flex-wrap justify-center gap-4">
                     {/* Gender Filter */}
-                    <div className="flex bg-rose-50 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedGenderAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >الكل</button>
                       <button 
                         onClick={() => setSelectedGenderAge('male')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'male' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >ذكور</button>
                       <button 
                         onClick={() => setSelectedGenderAge('female')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'female' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >إناث</button>
                     </div>
 
                     {/* Nationality Filter */}
-                    <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedNatAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >إجمالي</button>
                       <button 
                         onClick={() => setSelectedNatAge('omani')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'omani' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >عمانيون</button>
                       <button 
                         onClick={() => setSelectedNatAge('expat')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'expat' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >وافدون</button>
                     </div>
 
                     {/* Wilayat Filter */}
-                    <div className="flex bg-white/50 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <select 
                         value={selectedWilayatAge}
                         onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                        className="bg-transparent text-[#8B0000] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
+                        className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
                       >
                         <option value="all">كل الولايات</option>
                         {DATA_2025.wilayats.map(w => (
@@ -950,18 +967,18 @@ export default function App() {
                       </select>
                     </div>
 
-                    <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedYear('2024')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2024' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >2024</button>
                       <button 
                         onClick={() => setSelectedYear('2025')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2025' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >2025</button>
                       <button 
                         onClick={() => setSelectedYear('compare')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === 'compare' ? 'bg-red-700 text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >مقارنة</button>
                     </div>
                   </div>
@@ -973,15 +990,15 @@ export default function App() {
                       data={wilayatComparison}
                       margin={{ top: 20, right: 180, left: 150, bottom: 20 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(139,0,0,0.2)" strokeWidth={1} />
-                      <XAxis type="number" tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 13 }} axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }} />
-                      <YAxis dataKey="name" type="category" orientation="right" width={140} axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }} tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 16, textAnchor: 'start' }} />
+                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
+                      <XAxis type="number" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                      <YAxis dataKey="name" type="category" orientation="right" width={140} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} tick={{ fill: 'var(--text-main)', fontWeight: '900', fontSize: 16, textAnchor: 'start' }} />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', border: '3px solid #8B0000', borderRadius: '8px', fontWeight: 'bold' }}
-                        itemStyle={{ color: '#8B0000', fontSize: '14px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
+                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
                         formatter={(value) => value?.toLocaleString() ?? '0'} 
                       />
-                      <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: '#8B0000', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
+                      <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
                       {selectedYear === 'compare' ? (
                         <>
                           <Bar dataKey="male_2024" name="ذكور 2024" stackId="2024" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={1} />
@@ -1005,55 +1022,55 @@ export default function App() {
                 key="age"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card-polish p-8 bg-cyan-50 backdrop-blur-xl border border-[#8B0000]/20 shadow-lg"
+                className="card-polish p-8 card-shadow"
               >
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[#8B0000]/10 pb-4 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xl font-bold text-[#8B0000]">توزيع الفئات العمرية - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
-                    <p className="text-[10px] text-[#8B0000]/40 font-bold">
+                    <h3 className="text-xl font-black text-[var(--brand-primary)]">توزيع الفئات العمرية - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
+                    <p className="text-[10px] text-[var(--text-muted)] font-bold">
                       {selectedWilayatAge === 'all' ? 'عرض إجمالي المحافظة' : `بيانات فعلية لولاية ${selectedWilayatAge}`}
                     </p>
                   </div>
                   
                   <div className="flex flex-wrap justify-center gap-4">
                     {/* Gender Filter */}
-                    <div className="flex bg-rose-50 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedGenderAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >الكل</button>
                       <button 
                         onClick={() => setSelectedGenderAge('male')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'male' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >ذكور</button>
                       <button 
                         onClick={() => setSelectedGenderAge('female')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedGenderAge === 'female' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >إناث</button>
                     </div>
 
                     {/* Nationality Filter */}
-                    <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedNatAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'total' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >إجمالي</button>
                       <button 
                         onClick={() => setSelectedNatAge('omani')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'omani' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >عمانيون</button>
                       <button 
                         onClick={() => setSelectedNatAge('expat')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${selectedNatAge === 'expat' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >وافدون</button>
                     </div>
 
                     {/* Wilayat Filter */}
-                    <div className="flex bg-white/50 p-1 rounded-lg border border-[#8B0000]/10 overflow-x-auto max-w-[300px] no-scrollbar">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)] overflow-x-auto max-w-[300px] no-scrollbar">
                       <select 
                         value={selectedWilayatAge}
                         onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                        className="bg-transparent text-[#8B0000] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
+                        className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
                       >
                         <option value="all">كل الولايات</option>
                         {DATA_2025.wilayats.map(w => (
@@ -1062,18 +1079,18 @@ export default function App() {
                       </select>
                     </div>
 
-                    <div className="flex bg-cyan-100 p-1 rounded-lg border border-[#8B0000]/10">
+                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
                       <button 
                         onClick={() => setSelectedYear('2024')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2024' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >2024</button>
                       <button 
                         onClick={() => setSelectedYear('2025')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === '2025' ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >2025</button>
                       <button 
                         onClick={() => setSelectedYear('compare')}
-                        className={`px-4 py-1 rounded-md text-sm font-bold transition-all ${selectedYear === 'compare' ? 'bg-red-700 text-white shadow-sm' : 'text-[#8B0000]/60 hover:text-[#8B0000]'}`}
+                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
                       >مقارنة</button>
                     </div>
                   </div>
@@ -1084,26 +1101,26 @@ export default function App() {
                       data={ageGroupData}
                       margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(139,0,0,0.2)" strokeWidth={1} />
-                      <XAxis dataKey="range" tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 14 }} axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }} />
-                      <YAxis tick={{ fill: '#8B0000', fontWeight: '900', fontSize: 13 }} axisLine={{ stroke: '#8B0000', strokeWidth: 2.5 }} />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
+                      <XAxis dataKey="range" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                      <YAxis tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', border: '3px solid #8B0000', borderRadius: '8px', fontWeight: 'bold' }}
-                        itemStyle={{ color: '#8B0000', fontSize: '14px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
+                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
                         formatter={(value) => value?.toLocaleString() ?? '0'} 
                       />
-                      <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: '#8B0000', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
+                      <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
                       {selectedYear === 'compare' ? (
                         <>
                           <Bar dataKey="total_2024" name="إجمالي 2024" fill="#94a3b8" stroke="#475569" strokeWidth={1.5} />
                           <Bar dataKey="total_2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1.5} />
-                          <Line type="monotone" dataKey="total_2025" stroke="#8B0000" strokeWidth={4} dot={{ r: 6, fill: '#8B0000', strokeWidth: 2, stroke: '#fff' }} name="منحنى النمو" />
+                          <Line type="monotone" dataKey="total_2025" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="منحنى النمو" />
                         </>
                       ) : (
                         <>
                           <Bar dataKey="male" name="ذكور" stackId="a" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={2} />
                           <Bar dataKey="female" name="إناث" stackId="a" fill="#b91c1c" stroke="#7f1d1d" strokeWidth={2} />
-                          <Line type="monotone" dataKey="total" stroke="#8B0000" strokeWidth={4} dot={{ r: 6, fill: '#8B0000', strokeWidth: 2, stroke: '#fff' }} name="توزيع الفئات" />
+                          <Line type="monotone" dataKey="total" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="توزيع الفئات" />
                         </>
                       )}
                     </ComposedChart>
@@ -1115,18 +1132,18 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 mt-12 pt-8 border-t border-[#8B0000]/10 flex flex-col md:flex-row justify-between items-center gap-6 opacity-70">
+      <footer className="relative z-10 mt-12 pt-8 border-t border-[var(--border-ui)] flex flex-col md:flex-row justify-between items-center gap-6 opacity-70">
         <div className="flex items-center gap-4">
           <LubanTreeIcon />
           <div className="text-right">
-            <p className="font-bold text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">محافظة ظفار</p>
-            <p className="text-xs text-cyan-300/60">Census Report 2025</p>
+            <p className="font-bold text-[var(--brand-primary)]">محافظة ظفار</p>
+            <p className="text-xs text-[var(--text-muted)]">Census Report 2025</p>
           </div>
         </div>
-        <div className="text-center text-[10px] text-cyan-300 drop-shadow-[0_0_3px_rgba(34,211,238,0.4)]">
+        <div className="text-center text-[10px] text-[var(--text-muted)]">
           تم إعداد هذا التقرير بناء على مؤشرات وزارة الصحة -2024 و 2025
         </div>
-        <div className="text-left text-xs font-bold text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">
+        <div className="text-left text-xs font-black text-[var(--brand-primary)]">
           سلطنة عمان - المديرية العامة للخدمات الصحية بمحافظة ظفار
         </div>
       </footer>
