@@ -269,6 +269,23 @@ export default function App() {
   const [selectedNatAge, setSelectedNatAge] = useState('total');
   const [selectedGenderAge, setSelectedGenderAge] = useState('total');
 
+  const [selectedWilayatDetail, setSelectedWilayatDetail] = useState('صلالة');
+
+  const wilayatDetailData = useMemo(() => {
+    const w2024 = DATA_2024.wilayats.find(w => w.name === selectedWilayatDetail);
+    const w2025 = DATA_2025.wilayats.find(w => w.name === selectedWilayatDetail);
+    
+    if (!w2024 || !w2025) return [];
+
+    return [
+      { name: 'إجمالي السكان', 2024: w2024.total, 2025: w2025.total },
+      { name: 'عمانيون', 2024: w2024.omani, 2025: w2025.omani },
+      { name: 'وافدون', 2024: w2024.expat, 2025: w2025.expat },
+      { name: 'ذكور', 2024: w2024.male, 2025: w2025.male },
+      { name: 'إناث', 2024: w2024.female, 2025: w2025.female },
+    ];
+  }, [selectedWilayatDetail]);
+
   const calculateDynamicTotal = useMemo(() => (year: string, wilayatName: string, nationality: string, gender: string) => {
     if (nationality === 'total' && gender === 'total') {
         const yearData = year === '2024' ? DATA_2024 : DATA_2025;
@@ -475,6 +492,7 @@ export default function App() {
             { id: 'overview', label: 'التقرير الشامل', icon: <PieChartIcon size={18} /> },
             { id: 'wilayats', label: 'توزيع الولايات', icon: <MapPin size={18} /> },
             { id: 'age', label: 'الفئات العمرية', icon: <BarChartIcon size={18} /> },
+            { id: 'analysis', label: 'تحليل الولايات', icon: <Activity size={18} /> },
             { id: 'gender', label: 'توزيع النوع', icon: <Users size={18} /> },
             { id: 'composition', label: 'تركيبة السكان', icon: <Globe size={18} /> },
           ].map(tab => (
@@ -643,6 +661,144 @@ export default function App() {
               </div>
             </motion.div>
           )}
+
+            {activeTab === 'analysis' && (
+              <motion.div
+                key="analysis"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-6"
+              >
+                <div className="card-polish p-8 card-shadow">
+                  <div className="flex flex-col md:flex-row justify-between items-center mb-10 border-b border-[var(--border-ui)] pb-6 gap-6">
+                    <div className="flex flex-col gap-2">
+                       <div className="flex items-center gap-3">
+                         <div className="p-2 rounded-lg bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]">
+                           <MapPin size={24} />
+                         </div>
+                         <h3 className="text-2xl font-black text-[var(--brand-primary)]">تحليل الخصائص السكانية لولاية {selectedWilayatDetail}</h3>
+                       </div>
+                       <p className="text-sm text-[var(--text-muted)] font-bold">مقارنة المؤشرات الحيوية والتغير الديموغرافي 2024-2025</p>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-ui)]">
+                      <span className="text-xs font-black text-[var(--brand-primary)] px-2">اختر الولايات للتحليل:</span>
+                      <select 
+                        value={selectedWilayatDetail}
+                        onChange={(e) => setSelectedWilayatDetail(e.target.value)}
+                        className="bg-[var(--bg-card)] text-[var(--brand-primary)] text-sm font-black outline-none px-4 py-2 rounded-xl cursor-pointer shadow-sm border border-[var(--border-ui)]"
+                      >
+                        {DATA_2025.wilayats.map(w => (
+                          <option key={w.name} value={w.name}>{w.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Wilayat Summary Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                    {(() => {
+                      const w24 = DATA_2024.wilayats.find(w => w.name === selectedWilayatDetail);
+                      const w25 = DATA_2025.wilayats.find(w => w.name === selectedWilayatDetail);
+                      if (!w24 || !w25) return null;
+                      
+                      const growth = ((w25.total - w24.total) / w24.total * 100).toFixed(2);
+                      const omaniPct = (w25.omani / w25.total * 100).toFixed(1);
+                      const sexRatio = (w25.male / w25.female).toFixed(2);
+
+                      return (
+                        <>
+                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
+                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">إجمالي السكان 2025</div>
+                            <div className="text-2xl font-black text-[var(--brand-primary)]">{w25.total?.toLocaleString()}</div>
+                            <div className={`text-[10px] font-bold mt-1 ${Number(growth) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                               {Number(growth) >= 0 ? '↗' : '↘'} {growth}% منذ 2024
+                            </div>
+                          </div>
+                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
+                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">نسبة العمانيين</div>
+                            <div className="text-2xl font-black text-[var(--brand-primary)]">{omaniPct}%</div>
+                            <div className="text-[10px] text-[var(--text-muted)] font-bold mt-1">من إجمالي السكان</div>
+                          </div>
+                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
+                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">النمو العددي</div>
+                            <div className="text-2xl font-black text-[var(--brand-primary)]">{(w25.total - w24.total)?.toLocaleString()}</div>
+                            <div className="text-[10px] text-[var(--text-muted)] font-bold mt-1">نسمة خلال عام</div>
+                          </div>
+                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
+                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">معدل النوع (M:F)</div>
+                            <div className="text-2xl font-black text-[var(--brand-primary)]">{sexRatio}</div>
+                            <div className="text-[10px] text-[var(--text-muted)] font-bold mt-1">ذكر لكل أنثى</div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div className="h-[400px]">
+                      <h4 className="text-sm font-black text-[var(--brand-primary)] mb-4 flex items-center gap-2">
+                        <TrendingUp size={16} /> مقارنة المؤشرات (2024 vs 2025)
+                      </h4>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={wilayatDetailData} layout="vertical" margin={{ right: 140, left: 40, top: 10, bottom: 10 }} barGap={8}>
+                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-ui)" />
+                          <XAxis type="number" hide />
+                          <YAxis 
+                            dataKey="name" 
+                            type="category" 
+                            orientation="right"
+                            width={130} 
+                            tick={{ fill: 'var(--brand-primary)', fontWeight: 'black', fontSize: 13, textAnchor: 'start' }} 
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', textAlign: 'right' }}
+                            formatter={(value) => value?.toLocaleString()}
+                           />
+                          <Legend verticalAlign="top" height={36} wrapperStyle={{ fontWeight: 'bold' }} />
+                          <Bar dataKey="2024" name="بيانات 2024" fill="#94a3b8" radius={[0, 4, 4, 0]} barSize={14} />
+                          <Bar dataKey="2025" name="بيانات 2025" fill="var(--brand-primary)" radius={[0, 4, 4, 0]} barSize={14} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    <div className="h-[400px]">
+                      <h4 className="text-sm font-black text-[var(--brand-primary)] mb-4 flex items-center gap-2">
+                         <Activity size={16} /> تغير التركيبة السكانية
+                      </h4>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={[
+                            { ...DATA_2024.wilayats.find(w => w.name === selectedWilayatDetail), year: '2024' },
+                            { ...DATA_2025.wilayats.find(w => w.name === selectedWilayatDetail), year: '2025' }
+                          ]}
+                          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient id="colorOmani" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                            </linearGradient>
+                            <linearGradient id="colorExpat" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                              <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-ui)" />
+                          <XAxis dataKey="year" tick={{ fill: 'var(--text-muted)' }} />
+                          <YAxis tick={{ fill: 'var(--text-muted)' }} />
+                          <Tooltip />
+                          <Area type="monotone" dataKey="omani" stackId="1" stroke="#3b82f6" fillOpacity={1} fill="url(#colorOmani)" name="عمانيون" />
+                          <Area type="monotone" dataKey="expat" stackId="1" stroke="#ef4444" fillOpacity={1} fill="url(#colorExpat)" name="وافدون" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
           {activeTab === 'wilayats' && (
             <motion.div
@@ -1095,32 +1251,39 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <div className="h-[550px]">
+                <div className="h-[750px] mt-6">
                   <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart
+                      layout="vertical"
                       data={ageGroupData}
-                      margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
+                      margin={{ top: 10, right: 100, left: 40, bottom: 20 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
-                      <XAxis dataKey="range" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
-                      <YAxis tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
+                      <XAxis type="number" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 12 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                      <YAxis 
+                        dataKey="range" 
+                        type="category" 
+                        orientation="right"
+                        width={90}
+                        tick={{ fill: 'var(--text-main)', fontWeight: 'bold', fontSize: 13, textAnchor: 'start' }} 
+                        axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} 
+                        tickLine={false}
+                      />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
-                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', textAlign: 'right' }}
+                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '12px' }}
                         formatter={(value) => value?.toLocaleString() ?? '0'} 
                       />
                       <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
                       {selectedYear === 'compare' ? (
                         <>
-                          <Bar dataKey="total_2024" name="إجمالي 2024" fill="#94a3b8" stroke="#475569" strokeWidth={1.5} />
-                          <Bar dataKey="total_2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1.5} />
-                          <Line type="monotone" dataKey="total_2025" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="منحنى النمو" />
+                          <Bar dataKey="total_2024" name="إجمالي 2024" fill="#94a3b8" stroke="#475569" strokeWidth={1} barSize={12} radius={[0, 4, 4, 0]} />
+                          <Bar dataKey="total_2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1} barSize={12} radius={[0, 4, 4, 0]} />
                         </>
                       ) : (
                         <>
-                          <Bar dataKey="male" name="ذكور" stackId="a" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={2} />
-                          <Bar dataKey="female" name="إناث" stackId="a" fill="#b91c1c" stroke="#7f1d1d" strokeWidth={2} />
-                          <Line type="monotone" dataKey="total" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="توزيع الفئات" />
+                          <Bar dataKey="male" name="ذكور" stackId="a" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={1} barSize={22} radius={[0, 4, 4, 0]} />
+                          <Bar dataKey="female" name="إناث" stackId="a" fill="#b91c1c" stroke="#7f1d1d" strokeWidth={1} barSize={22} radius={[0, 4, 4, 0]} />
                         </>
                       )}
                     </ComposedChart>
