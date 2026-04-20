@@ -12,6 +12,7 @@
 :root {
   --brand-primary: #8B0000;
   --brand-accent: #DAA520;
+  --brand-accent-glow: rgba(218, 165, 32, 0.4);
   --bg-main: #fcfaf7;
   --bg-card: #ffffff;
   --bg-surface: #f7f3ee;

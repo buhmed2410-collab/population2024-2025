@@ -37,7 +37,8 @@ import {
   HeartPulse,
   Globe,
   PieChart as PieChartIcon,
-  BarChart as BarChartIcon
+  BarChart as BarChartIcon,
+  FileText
 } from 'lucide-react';
 
 // --- Icons & Decorative Elements ---
@@ -269,23 +270,6 @@ export default function App() {
   const [selectedNatAge, setSelectedNatAge] = useState('total');
   const [selectedGenderAge, setSelectedGenderAge] = useState('total');
 
-  const [selectedWilayatDetail, setSelectedWilayatDetail] = useState('صلالة');
-
-  const wilayatDetailData = useMemo(() => {
-    const w2024 = DATA_2024.wilayats.find(w => w.name === selectedWilayatDetail);
-    const w2025 = DATA_2025.wilayats.find(w => w.name === selectedWilayatDetail);
-    
-    if (!w2024 || !w2025) return [];
-
-    return [
-      { name: 'إجمالي السكان', 2024: w2024.total, 2025: w2025.total },
-      { name: 'عمانيون', 2024: w2024.omani, 2025: w2025.omani },
-      { name: 'وافدون', 2024: w2024.expat, 2025: w2025.expat },
-      { name: 'ذكور', 2024: w2024.male, 2025: w2025.male },
-      { name: 'إناث', 2024: w2024.female, 2025: w2025.female },
-    ];
-  }, [selectedWilayatDetail]);
-
   const calculateDynamicTotal = useMemo(() => (year: string, wilayatName: string, nationality: string, gender: string) => {
     if (nationality === 'total' && gender === 'total') {
         const yearData = year === '2024' ? DATA_2024 : DATA_2025;
@@ -449,7 +433,8 @@ export default function App() {
             <div className="text-right">
               <div className="font-black text-[var(--brand-primary)] text-sm leading-tight">المديرية العامة للخدمات الصحية</div>
               <div className="font-black text-[var(--brand-primary)] text-sm leading-tight mb-1">بمحافظة ظفار</div>
-              <div className="text-[11px] text-[var(--text-muted)] font-bold">دائرة التخطيط والتنظيم الصحي</div>
+              <div className="text-[10px] text-[var(--text-muted)] font-bold mb-0.5">دائرة التخطيط والتنظيم الصحي</div>
+              <div className="text-[11px] text-[var(--brand-secondary)] font-black">إدارة المعلومات الصحية</div>
             </div>
           </div>
           
@@ -471,15 +456,15 @@ export default function App() {
         </div>
         
         <div className="text-center flex-grow">
-          <h1 className={`${theme === 'royal' ? 'font-serif' : 'font-sans'} text-3xl md:text-4xl font-black text-[var(--brand-primary)] tracking-tight m-0 drop-shadow-sm`}>تعداد سكان محافظة ظفار</h1>
-          <h2 className="text-lg text-[var(--text-muted)] font-bold m-0 opacity-80">مقارنة تحليلية شاملة (2024 - 2025)</h2>
+          <h1 className={`${theme === 'royal' ? 'font-serif' : 'font-sans'} text-3xl md:text-5xl lg:text-6xl font-black text-[var(--brand-primary)] tracking-tight m-0 drop-shadow-sm transition-all duration-500 whitespace-nowrap`}>التعداد السكاني لظفار 2024-2025</h1>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="text-left">
             <div className="font-bold text-[var(--brand-primary)] text-[11px] leading-tight opacity-80">Directorate General of Health Services</div>
             <div className="font-bold text-[var(--brand-primary)] text-[11px] leading-tight mb-1 opacity-80">Dhofar Governorate</div>
-            <div className="text-[10px] text-[var(--text-muted)] font-semibold">Health Planning & Organization</div>
+            <div className="text-[9px] text-[var(--text-muted)] font-semibold mb-0.5">Health Planning & Organization</div>
+            <div className="text-[10px] text-[var(--brand-secondary)] font-black">Health Information Management</div>
           </div>
           <LubanTreeIcon />
         </div>
@@ -490,9 +475,9 @@ export default function App() {
         <nav className="relative z-10 flex flex-wrap justify-center mb-10 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-ui)] gap-1 shadow-sm max-w-4xl mx-auto">
           {[
             { id: 'overview', label: 'التقرير الشامل', icon: <PieChartIcon size={18} /> },
+            { id: 'analysis', label: 'التحليل المقارن', icon: <TrendingUp size={18} /> },
             { id: 'wilayats', label: 'توزيع الولايات', icon: <MapPin size={18} /> },
             { id: 'age', label: 'الفئات العمرية', icon: <BarChartIcon size={18} /> },
-            { id: 'analysis', label: 'تحليل الولايات', icon: <Activity size={18} /> },
             { id: 'gender', label: 'توزيع النوع', icon: <Users size={18} /> },
             { id: 'composition', label: 'تركيبة السكان', icon: <Globe size={18} /> },
           ].map(tab => (
@@ -511,294 +496,412 @@ export default function App() {
           ))}
         </nav>
 
+        {/* Global Filter Bar - Centralized for all tabs */}
+        <div className="relative z-20 sticky top-4 mb-4 flex flex-wrap justify-center gap-3 bg-[var(--bg-card)]/80 backdrop-blur-md p-3 rounded-2xl border border-[var(--border-ui)] shadow-lg max-w-fit mx-auto">
+          <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
+            <MapPin size={16} className="text-[var(--brand-primary)]" />
+            <select 
+              value={selectedWilayatAge}
+              onChange={(e) => setSelectedWilayatAge(e.target.value)}
+              className="bg-transparent text-[var(--brand-primary)] text-sm font-black outline-none cursor-pointer rtl:pr-1"
+            >
+              <option value="all">كل الولايات (المحافظة)</option>
+              {DATA_2025.wilayats.map(w => (
+                <option key={w.name} value={w.name}>{w.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
+            <Calendar size={16} className="text-[var(--brand-primary)]" />
+            <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
+              {['2024', '2025', 'compare'].map(y => (
+                <button
+                  key={y}
+                  onClick={() => setSelectedYear(y)}
+                  className={`px-3 py-1 text-xs font-black transition-all ${
+                    selectedYear === y 
+                      ? 'bg-[var(--brand-primary)] text-white' 
+                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
+                  }`}
+                >
+                  {y === 'compare' ? 'مقارنة' : y}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
+            <Users size={16} className="text-[var(--brand-primary)]" />
+            <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
+              {['total', 'omani', 'expat'].map(n => (
+                <button
+                  key={n}
+                  onClick={() => setSelectedNatAge(n)}
+                  className={`px-3 py-1 text-xs font-black transition-all ${
+                    selectedNatAge === n 
+                      ? 'bg-[var(--brand-primary)] text-white' 
+                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
+                  }`}
+                >
+                  {n === 'total' ? 'إجمالي' : n === 'omani' ? 'عمانيون' : 'وافدون'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Activity size={16} className="text-[var(--brand-primary)]" />
+            <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
+              {['total', 'male', 'female'].map(g => (
+                <button
+                  key={g}
+                  onClick={() => setSelectedGenderAge(g)}
+                  className={`px-3 py-1 text-xs font-black transition-all ${
+                    selectedGenderAge === g 
+                      ? 'bg-[var(--brand-primary)] text-white' 
+                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
+                  }`}
+                >
+                  {g === 'total' ? 'الكل' : g === 'male' ? 'ذكور' : 'إناث'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <AnimatePresence mode="wait">
-          {activeTab === 'overview' && (
+          {activeTab === 'analysis' && (
             <motion.div
-              key="overview"
+              key="analysis"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+              className="space-y-6"
             >
-              <div className="flex flex-col gap-6">
-                <div className="card-polish p-6 card-shadow border-t-4 border-t-[var(--brand-primary)]">
-                  <span className="stat-label-polish">إجمالي السكان 2024</span>
-                  <span className="stat-value-polish block my-2">{DATA_2024.total.toLocaleString()}</span>
-                  <span className="text-xs text-[var(--text-muted)]">نسمة</span>
-                </div>
-                <div className="card-polish p-6 card-shadow border-t-4 border-t-[var(--brand-primary)]">
-                  <span className="stat-label-polish">إجمالي السكان 2025</span>
-                  <span className="stat-value-polish block my-2">{DATA_2025.total.toLocaleString()}</span>
-                  <span className="text-xs text-[var(--text-muted)]">نسمة</span>
-                </div>
-                <div className="card-polish p-6 card-shadow border-r-4 border-r-[var(--brand-accent)]">
-                  <span className="stat-label-polish">معدل النمو السنوي</span>
-                  <span className="stat-value-polish block my-2 text-green-600">0.55%</span>
-                  <span className="text-xs text-[var(--text-muted)]">+{(DATA_2025.total - DATA_2024.total).toLocaleString()} نسمة</span>
-                </div>
-                
-                <div className="card-polish p-6 card-shadow border-l-4 border-l-[var(--brand-primary)]">
-                  <span className="stat-label-polish block mb-4">توزيع النوع (2025)</span>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-[var(--text-muted)] font-black">ذكور</span>
-                      <div className="flex items-center gap-3">
-                        <span className="font-black text-blue-600 text-xl">{(342726).toLocaleString()}</span>
-                        <div className="h-2 flex-grow bg-[var(--bg-surface)] rounded-full overflow-hidden">
-                          <div className="h-full bg-blue-600" style={{ width: '64%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-[var(--text-muted)] font-black">إناث</span>
-                      <div className="flex items-center gap-3">
-                        <span className="font-black text-red-700 text-xl">{(189793).toLocaleString()}</span>
-                        <div className="h-2 flex-grow bg-[var(--bg-surface)] rounded-full overflow-hidden">
-                          <div className="h-full bg-red-700" style={{ width: '36%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {(() => {
+                  const currentWilayat = wilayatComparison[0];
+                  if (!currentWilayat) return null;
+                  
+                  const totalGrowth = parseFloat(currentWilayat.growth);
+                  const omaniGrowth = currentWilayat.omani_2024 > 0 
+                    ? ((currentWilayat.omani_2025 - currentWilayat.omani_2024) / currentWilayat.omani_2024 * 100).toFixed(1) 
+                    : '0.0';
+                  const expatGrowth = currentWilayat.expat_2024 > 0 
+                    ? ((currentWilayat.expat_2025 - currentWilayat.expat_2024) / currentWilayat.expat_2024 * 100).toFixed(1) 
+                    : '0.0';
+                  
+                  return (
+                    <>
+                      <StatCard 
+                        title="نمو إجمالي السكان" 
+                        value={`${totalGrowth > 0 ? '+' : ''}${totalGrowth}%`} 
+                        subValue={selectedWilayatAge === 'all' ? 'على مستوى المحافظة' : `في ولاية ${selectedWilayatAge}`} 
+                        icon={TrendingUp} 
+                        trend={totalGrowth}
+                        color="var(--brand-primary)" 
+                      />
+                      <StatCard 
+                        title="نمو السكان العمانيين" 
+                        value={`${parseFloat(omaniGrowth) > 0 ? '+' : ''}${omaniGrowth}%`} 
+                        subValue="مواطنون" 
+                        icon={UserCheck} 
+                        trend={parseFloat(omaniGrowth)}
+                        color="#3b82f6" 
+                      />
+                      <StatCard 
+                        title="تغير سكان الوافدين" 
+                        value={`${parseFloat(expatGrowth) > 0 ? '+' : ''}${expatGrowth}%`} 
+                        subValue="مقيمون" 
+                        icon={Globe} 
+                        trend={parseFloat(expatGrowth)}
+                        color="#ef4444" 
+                      />
+                      <StatCard 
+                        title="إجمالي الزيادة العددية" 
+                        value={(currentWilayat['2025'] - currentWilayat['2024']).toLocaleString()} 
+                        subValue="نسمة إضافية" 
+                        icon={Users} 
+                        trend={currentWilayat['2025'] - currentWilayat['2024']}
+                        color="var(--brand-accent)" 
+                      />
+                    </>
+                  );
+                })()}
               </div>
 
-              <div className="card-polish p-6 flex flex-col card-shadow">
-                <span className="stat-label-polish border-b border-[var(--border-ui)] pb-2 mb-4">التوزيع النسبي حسب الجنسية</span>
-                
-                <div className="flex flex-col gap-8 flex-grow">
-                  {/* 2024 Distribution */}
-                  <div>
-                    <span className="text-xs font-bold text-[var(--text-muted)] mb-2 block">سنة 2024</span>
-                    <div className="w-full h-10 bg-[var(--bg-surface)] rounded-xl overflow-hidden flex border-2 border-[var(--border-ui)] shadow-md mb-2">
-                      <div className="h-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-black border-l border-blue-800" style={{ width: `${(DATA_2024.omani / DATA_2024.total * 100).toFixed(1)}%` }}>
-                        {(DATA_2024.omani / DATA_2024.total * 100).toFixed(1)}%
-                      </div>
-                      <div className="h-full bg-red-700 flex items-center justify-center text-white text-[10px] font-black" style={{ width: `${(DATA_2024.expat / DATA_2024.total * 100).toFixed(1)}%` }}>
-                        {(DATA_2024.expat / DATA_2024.total * 100).toFixed(1)}%
-                      </div>
-                    </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="card-polish p-6 card-shadow">
+                  <h3 className={`text-xl font-black text-[var(--brand-primary)] mb-6 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>مقارنة سنوية دقيقة (2024-2025)</h3>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={wilayatComparison}>
+                        <XAxis dataKey="name" hide />
+                        <YAxis tick={{ fill: 'var(--text-muted)' }} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px' }}
+                          formatter={(value) => [value?.toLocaleString(), 'نسمة']}
+                        />
+                        <Legend />
+                        <Bar dataKey="2024" name="سنة 2024" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="2025" name="سنة 2025" fill="var(--brand-primary)" radius={[4, 4, 0, 0]} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
                   </div>
+                </div>
 
-                  {/* 2025 Distribution */}
-                  <div>
-                    <span className="text-xs font-bold text-[var(--text-muted)] mb-2 block">سنة 2025</span>
-                    <div className="w-full h-10 bg-[var(--bg-surface)] rounded-xl overflow-hidden flex border-2 border-[var(--border-ui)] shadow-md mb-2">
-                      <div className="h-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-black border-l border-blue-800" style={{ width: `${(DATA_2025.omani / DATA_2025.total * 100).toFixed(1)}%` }}>
-                        {(DATA_2025.omani / DATA_2025.total * 100).toFixed(1)}%
-                      </div>
-                      <div className="h-full bg-red-700 flex items-center justify-center text-white text-[10px] font-black" style={{ width: `${(DATA_2025.expat / DATA_2025.total * 100).toFixed(1)}%` }}>
-                        {(DATA_2025.expat / DATA_2025.total * 100).toFixed(1)}%
-                      </div>
-                    </div>
+                <div className="card-polish p-6 card-shadow relative overflow-hidden">
+                  {/* Decorative Flourish icon background */}
+                  <div className="absolute -bottom-6 -left-6 opacity-[0.03] scale-150 rotate-12">
+                    <KhanjarIcon />
                   </div>
-
-                  <div className="flex justify-between text-xs font-black text-[var(--text-main)]">
-                    <span className="bg-blue-100/50 px-3 py-1 rounded-lg border border-blue-400 flex items-center gap-2">
-                       <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>
-                       <span>عمانيون</span>
-                    </span>
-                    <span className="bg-red-100/50 px-3 py-1 rounded-lg border border-red-400 flex items-center gap-2">
-                       <div className="w-2.5 h-2.5 bg-red-700 rounded-full"></div>
-                       <span>وافدون</span>
-                    </span>
-                  </div>
-                  
-                  <div className="mt-4 border-t border-[var(--border-ui)] pt-4">
-                    <span className="stat-label-polish block mb-3">أهم الولايات (نمو)</span>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-[var(--text-muted)]">
-                      {wilayatComparison.slice(0, 6).map(w => (
-                        <div key={w.name} className="flex justify-between border-b border-dashed border-[var(--border-ui)] pb-0.5">
-                          <span>{w.name}:</span>
-                          <span className="font-bold text-red-700">{w.growth}%</span>
-                        </div>
-                      ))}
-                    </div>
+                  <h3 className={`text-xl font-black text-[var(--brand-primary)] mb-6 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>تحليل التركيبة الديموغرافية</h3>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'عمانيين', value: wilayatComparison[0]?.omani_2025 || 0 },
+                            { name: 'وافدين', value: wilayatComparison[0]?.expat_2025 || 0 },
+                          ]}
+                          innerRadius={80}
+                          outerRadius={100}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          <Cell fill="#3b82f6" strokeWidth={2} stroke="#fff" />
+                          <Cell fill="#ef4444" strokeWidth={2} stroke="#fff" />
+                          <Label 
+                            position="center"
+                            content={(props) => (
+                              <text x={props.viewBox.cx} y={props.viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                                <tspan x={props.viewBox.cx} dy="-0.5em" fontSize="12" fill="var(--text-muted)" fontWeight="bold">إجمالي</tspan>
+                                <tspan x={props.viewBox.cx} dy="1.5em" fontSize="20" fill="var(--brand-primary)" fontWeight="black">{wilayatComparison[0]?.['2025']?.toLocaleString()}</tspan>
+                              </text>
+                            )}
+                          />
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
               </div>
 
               <div className="card-polish p-6 card-shadow">
-                <span className="stat-label-polish border-b border-[var(--border-ui)] pb-2 mb-4 block">تحليل النمو والفرق الجوهري</span>
-                <div className="h-[200px] mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={comparisonData.slice(0, 1)} margin={{ top: 25, right: 30, left: 20, bottom: 5 }}>
-                      <XAxis dataKey="name" hide />
-                      <YAxis hide />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
-                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
-                        formatter={(value) => [value?.toLocaleString() ?? '0', 'نسمة']} 
-                      />
-                      <Bar 
-                        dataKey="2024" 
-                        fill="#94a3b8" 
-                        stroke="#475569"
-                        strokeWidth={2}
-                        radius={[6, 6, 0, 0]} 
-                        barSize={70} 
-                        label={{ position: 'top', fill: 'var(--brand-primary)', fontSize: 14, fontWeight: '900', offset: 10 }} 
-                      />
-                      <Bar 
-                        dataKey="2025" 
-                        fill="#ef4444" 
-                        stroke="#991b1b"
-                        strokeWidth={2}
-                        radius={[6, 6, 0, 0]} 
-                        barSize={70} 
-                        label={{ position: 'top', fill: 'var(--brand-primary)', fontSize: 14, fontWeight: '900', offset: 10 }} 
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-6 bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
-                  <h3 className="text-[var(--brand-primary)] font-bold text-lg mb-2">أبرز الفروقات والنتائج:</h3>
-                  <ul className="text-sm space-y-2 list-disc pr-4 leading-relaxed text-[var(--text-muted)]">
-                    <li>زيادة ملحوظة في الفئة العمرية (15-35) بنسبة 5%.</li>
-                    <li>توسع في الكثافة السكانية بمركز مدينة صلالة.</li>
-                    <li>ارتفاع نسبة المواطنين العمانيين في المحافظة.</li>
-                  </ul>
+                <h3 className={`text-lg font-black text-[var(--brand-primary)] mb-4 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>ملخص التغيرات البارزة</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
+                    <div className="text-emerald-600 font-black text-sm mb-1">أعلى نمو</div>
+                    <div className="text-lg font-bold">{wilayatComparison[0]?.name}</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-1">سجلت هذه الولاية تغيراً بنسبة {wilayatComparison[0]?.growth}% خلال العام.</div>
+                  </div>
+                  <div className="bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
+                    <div className="text-blue-600 font-black text-sm mb-1">التوازن الوطني</div>
+                    <div className="text-lg font-bold">{((wilayatComparison[0]?.omani_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1)}%</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-1">نسبة المواطنين العمانيين من إجمالي سكان الولاية في 2025.</div>
+                  </div>
+                  <div className="bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
+                    <div className="text-red-600 font-black text-sm mb-1">القوى العاملة الوافدة</div>
+                    <div className="text-lg font-bold">{((wilayatComparison[0]?.expat_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1)}%</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-1">نسبة الوافدين المقيمين في الولاية حسب بيانات 2025.</div>
+                  </div>
                 </div>
               </div>
             </motion.div>
           )}
 
-            {activeTab === 'analysis' && (
-              <motion.div
-                key="analysis"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="space-y-6"
-              >
-                <div className="card-polish p-8 card-shadow">
-                  <div className="flex flex-col md:flex-row justify-between items-center mb-10 border-b border-[var(--border-ui)] pb-6 gap-6">
-                    <div className="flex flex-col gap-2">
-                       <div className="flex items-center gap-3">
-                         <div className="p-2 rounded-lg bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]">
-                           <MapPin size={24} />
-                         </div>
-                         <h3 className="text-2xl font-black text-[var(--brand-primary)]">تحليل الخصائص السكانية لولاية {selectedWilayatDetail}</h3>
+          {activeTab === 'overview' && (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              className="space-y-6"
+            >
+              {/* Summary KPIs Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="card-polish p-5 card-shadow border-t-4 border-[var(--brand-primary)] bg-white/80">
+                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">إجمالي السكان 2024</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-[var(--brand-primary)]">{DATA_2024.total.toLocaleString()}</span>
+                    <span className="text-[10px] font-bold opacity-60">نسمة</span>
+                  </div>
+                </div>
+                <div className="card-polish p-5 card-shadow border-t-4 border-[var(--brand-primary)] bg-white/80">
+                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">إجمالي السكان 2025</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-[var(--brand-primary)]">{DATA_2025.total.toLocaleString()}</span>
+                    <span className="text-[10px] font-bold opacity-60">نسمة</span>
+                  </div>
+                </div>
+                <div className="card-polish p-5 card-shadow border-t-4 border-emerald-500 bg-white/80">
+                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">الزيادة العددية</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-emerald-600">+{ (DATA_2025.total - DATA_2024.total).toLocaleString() }</span>
+                    <TrendingUp size={14} className="text-emerald-500" />
+                  </div>
+                </div>
+                <div className="card-polish p-5 card-shadow border-t-4 border-[var(--brand-accent)] bg-white/80">
+                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">معدل النمو السنوي</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-[var(--brand-accent)]">0.55%</span>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Visualizations Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Nationality Distribution Card */}
+                <div className="card-polish p-6 card-shadow">
+                  <div className="flex items-center gap-2 mb-6 border-b border-[var(--border-ui)] pb-3">
+                    <Globe size={18} className="text-[var(--brand-primary)]" />
+                    <h3 className={`text-lg font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>التشكيل الديموغرافي (عماني / وافد)</h3>
+                  </div>
+                  
+                  <div className="space-y-8">
+                    <div>
+                      <div className="flex justify-between text-[10px] font-bold text-[var(--text-muted)] mb-2 px-1">
+                        <span>إحصاء 2024</span>
+                        <span>{((DATA_2024.omani / DATA_2024.total)*100).toFixed(1)}% عماني</span>
+                      </div>
+                      <div className="w-full h-8 bg-[var(--bg-surface)] rounded-full overflow-hidden flex border border-[var(--border-ui)] shadow-inner">
+                        <div className="h-full bg-blue-600 transition-all duration-1000" style={{ width: `${(DATA_2024.omani / DATA_2024.total * 100)}%` }}></div>
+                        <div className="h-full bg-red-700 transition-all duration-1000" style={{ width: `${(DATA_2024.expat / DATA_2024.total * 100)}%` }}></div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-[10px] font-bold text-[var(--text-muted)] mb-2 px-1">
+                        <span>إحصاء 2025</span>
+                        <span>{((DATA_2025.omani / DATA_2025.total)*100).toFixed(1)}% عماني</span>
+                      </div>
+                      <div className="w-full h-10 bg-[var(--bg-surface)] rounded-full overflow-hidden flex border-2 border-[var(--brand-primary)]/20 shadow-md">
+                        <div className="h-full bg-blue-600 transition-all duration-1000 flex items-center justify-center text-[10px] text-white font-black" style={{ width: `${(DATA_2025.omani / DATA_2025.total * 100)}%` }}>{ (DATA_2025.omani / DATA_2025.total * 100).toFixed(1) }%</div>
+                        <div className="h-full bg-red-700 transition-all duration-1000 flex items-center justify-center text-[10px] text-white font-black" style={{ width: `${(DATA_2025.expat / DATA_2025.total * 100)}%` }}>{ (DATA_2025.expat / DATA_2025.total * 100).toFixed(1) }%</div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center gap-10 pt-2">
+                       <div className="flex items-center gap-2">
+                         <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                         <span className="text-xs font-black text-[var(--text-main)]">مواطنون</span>
                        </div>
-                       <p className="text-sm text-[var(--text-muted)] font-bold">مقارنة المؤشرات الحيوية والتغير الديموغرافي 2024-2025</p>
-                    </div>
-
-                    <div className="flex items-center gap-3 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-ui)]">
-                      <span className="text-xs font-black text-[var(--brand-primary)] px-2">اختر الولايات للتحليل:</span>
-                      <select 
-                        value={selectedWilayatDetail}
-                        onChange={(e) => setSelectedWilayatDetail(e.target.value)}
-                        className="bg-[var(--bg-card)] text-[var(--brand-primary)] text-sm font-black outline-none px-4 py-2 rounded-xl cursor-pointer shadow-sm border border-[var(--border-ui)]"
-                      >
-                        {DATA_2025.wilayats.map(w => (
-                          <option key={w.name} value={w.name}>{w.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Wilayat Summary Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-                    {(() => {
-                      const w24 = DATA_2024.wilayats.find(w => w.name === selectedWilayatDetail);
-                      const w25 = DATA_2025.wilayats.find(w => w.name === selectedWilayatDetail);
-                      if (!w24 || !w25) return null;
-                      
-                      const growth = ((w25.total - w24.total) / w24.total * 100).toFixed(2);
-                      const omaniPct = (w25.omani / w25.total * 100).toFixed(1);
-                      const sexRatio = (w25.male / w25.female).toFixed(2);
-
-                      return (
-                        <>
-                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
-                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">إجمالي السكان 2025</div>
-                            <div className="text-2xl font-black text-[var(--brand-primary)]">{w25.total?.toLocaleString()}</div>
-                            <div className={`text-[10px] font-bold mt-1 ${Number(growth) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                               {Number(growth) >= 0 ? '↗' : '↘'} {growth}% منذ 2024
-                            </div>
-                          </div>
-                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
-                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">نسبة العمانيين</div>
-                            <div className="text-2xl font-black text-[var(--brand-primary)]">{omaniPct}%</div>
-                            <div className="text-[10px] text-[var(--text-muted)] font-bold mt-1">من إجمالي السكان</div>
-                          </div>
-                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
-                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">النمو العددي</div>
-                            <div className="text-2xl font-black text-[var(--brand-primary)]">{(w25.total - w24.total)?.toLocaleString()}</div>
-                            <div className="text-[10px] text-[var(--text-muted)] font-bold mt-1">نسمة خلال عام</div>
-                          </div>
-                          <div className="bg-[var(--bg-surface)] p-5 rounded-2xl border border-[var(--border-ui)] text-center">
-                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase mb-1">معدل النوع (M:F)</div>
-                            <div className="text-2xl font-black text-[var(--brand-primary)]">{sexRatio}</div>
-                            <div className="text-[10px] text-[var(--text-muted)] font-bold mt-1">ذكر لكل أنثى</div>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    <div className="h-[400px]">
-                      <h4 className="text-sm font-black text-[var(--brand-primary)] mb-4 flex items-center gap-2">
-                        <TrendingUp size={16} /> مقارنة المؤشرات (2024 vs 2025)
-                      </h4>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={wilayatDetailData} layout="vertical" margin={{ right: 140, left: 40, top: 10, bottom: 10 }} barGap={8}>
-                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-ui)" />
-                          <XAxis type="number" hide />
-                          <YAxis 
-                            dataKey="name" 
-                            type="category" 
-                            orientation="right"
-                            width={130} 
-                            tick={{ fill: 'var(--brand-primary)', fontWeight: 'black', fontSize: 13, textAnchor: 'start' }} 
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', textAlign: 'right' }}
-                            formatter={(value) => value?.toLocaleString()}
-                           />
-                          <Legend verticalAlign="top" height={36} wrapperStyle={{ fontWeight: 'bold' }} />
-                          <Bar dataKey="2024" name="بيانات 2024" fill="#94a3b8" radius={[0, 4, 4, 0]} barSize={14} />
-                          <Bar dataKey="2025" name="بيانات 2025" fill="var(--brand-primary)" radius={[0, 4, 4, 0]} barSize={14} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="h-[400px]">
-                      <h4 className="text-sm font-black text-[var(--brand-primary)] mb-4 flex items-center gap-2">
-                         <Activity size={16} /> تغير التركيبة السكانية
-                      </h4>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart
-                          data={[
-                            { ...DATA_2024.wilayats.find(w => w.name === selectedWilayatDetail), year: '2024' },
-                            { ...DATA_2025.wilayats.find(w => w.name === selectedWilayatDetail), year: '2025' }
-                          ]}
-                          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                        >
-                          <defs>
-                            <linearGradient id="colorOmani" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                            </linearGradient>
-                            <linearGradient id="colorExpat" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                              <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-ui)" />
-                          <XAxis dataKey="year" tick={{ fill: 'var(--text-muted)' }} />
-                          <YAxis tick={{ fill: 'var(--text-muted)' }} />
-                          <Tooltip />
-                          <Area type="monotone" dataKey="omani" stackId="1" stroke="#3b82f6" fillOpacity={1} fill="url(#colorOmani)" name="عمانيون" />
-                          <Area type="monotone" dataKey="expat" stackId="1" stroke="#ef4444" fillOpacity={1} fill="url(#colorExpat)" name="وافدون" />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                       <div className="flex items-center gap-2">
+                         <div className="w-3 h-3 rounded-full bg-red-700"></div>
+                         <span className="text-xs font-black text-[var(--text-main)]">وافدون</span>
+                       </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            )}
+
+                {/* Gender Distribution Card */}
+                <div className="card-polish p-6 card-shadow">
+                  <div className="flex items-center gap-2 mb-6 border-b border-[var(--border-ui)] pb-3">
+                    <Users size={18} className="text-[var(--brand-primary)]" />
+                    <h3 className={`text-lg font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>التوازن النوعي (2025)</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center h-full">
+                    <div className="flex flex-col gap-6">
+                      <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                        <span className="text-[10px] font-black text-blue-700 uppercase block mb-1">الذكور</span>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-black text-blue-900">{(342726).toLocaleString()}</span>
+                          <span className="text-xs font-bold text-blue-700">64.4%</span>
+                        </div>
+                      </div>
+                      <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
+                        <span className="text-[10px] font-black text-red-700 uppercase block mb-1">الإناث</span>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-black text-red-900">{(189793).toLocaleString()}</span>
+                          <span className="text-xs font-bold text-red-700">35.6%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center p-4 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-ui)] border-dashed">
+                       <span className="text-[10px] font-bold text-[var(--text-muted)] mb-4">كثافة النمو (النوع)</span>
+                       <div className="relative w-32 h-32 flex items-center justify-center">
+                          <svg className="w-full h-full -rotate-90">
+                             <circle cx="64" cy="64" r="54" fill="transparent" stroke="var(--border-ui)" strokeWidth="12" />
+                             <circle cx="64" cy="64" r="54" fill="transparent" stroke="#1d4ed8" strokeWidth="12" strokeDasharray="340" strokeDashoffset={340 - (340 * 0.644)} strokeLinecap="round" />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                             <span className="text-xl font-black text-[var(--brand-primary)]">64%</span>
+                             <span className="text-[8px] font-bold opacity-60">نسمة</span>
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Insights Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* 1. Wilayats Insight */}
+                <div className="card-polish p-5 card-shadow border-r-4 border-[var(--brand-primary)] group hover:bg-[var(--brand-primary)] hover:text-white transition-all duration-300">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin size={18} className="group-hover:text-white text-[var(--brand-primary)]" />
+                    <h4 className="font-black text-sm">تحليل الولايات</h4>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                    سجلت ولاية <span className="font-bold">شليم</span> أعلى نمو بنسبة 11.3%، بينما شهدت <span className="font-bold">المزيونة</span> استقراراً للمواطنين بزيادة 7.0%.
+                  </p>
+                </div>
+
+                {/* 2. Age Insight */}
+                <div className="card-polish p-5 card-shadow border-r-4 border-amber-500 group hover:bg-amber-600 hover:text-white transition-all duration-300">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Activity size={18} className="group-hover:text-white text-amber-600" />
+                    <h4 className="font-black text-sm">الفئات العمرية</h4>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                    المجتمع في محافظة ظفار يتسم بالفتوة، حيث تشكل الفئة العمرية <span className="font-bold">15-44 سنة</span> الركيزة الأساسية للتركيبة السكانية.
+                  </p>
+                </div>
+
+                {/* 3. Gender Insight */}
+                <div className="card-polish p-5 card-shadow border-r-4 border-emerald-500 group hover:bg-emerald-600 hover:text-white transition-all duration-300">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users size={18} className="group-hover:text-white text-emerald-600" />
+                    <h4 className="font-black text-sm">التوازن النوعي</h4>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                    توازن مثالي بين المواطنين (51% ذكور / 49% إناث)، مع تحسن في أعداد الإناث المواطنات بنسبة نمو بلغت 3.1%.
+                  </p>
+                </div>
+
+                {/* 4. Composition Insight */}
+                <div className="card-polish p-5 card-shadow border-r-4 border-blue-500 group hover:bg-blue-600 hover:text-white transition-all duration-300">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Globe size={18} className="group-hover:text-white text-blue-600" />
+                    <h4 className="font-black text-sm">تركيبة السكان</h4>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                    ارتفعت حصة المواطنين إلى <span className="font-bold">45.9%</span>، مما يعكس نجاح سياسات التوطين والاستقرار السكاني في المحافظة.
+                  </p>
+                </div>
+              </div>
+
+              {/* Secondary Context Bar */}
+              <div className="card-polish p-4 border border-[var(--border-ui)] border-dashed flex justify-between items-center bg-gray-50/30">
+                 <div className="flex items-center gap-4">
+                    <div className="text-[10px] font-bold text-[var(--text-muted)] italic">أهم الولايات نمواً:</div>
+                    <div className="flex gap-4">
+                       {wilayatComparison.slice(0, 3).map(w => (
+                         <div key={w.name} className="flex items-center gap-1">
+                           <span className="text-[11px] font-black">{w.name}</span>
+                           <span className="text-[11px] font-bold text-red-700">({w.growth}%)</span>
+                         </div>
+                       ))}
+                    </div>
+                 </div>
+              </div>
+            </motion.div>
+          )}
 
           {activeTab === 'wilayats' && (
             <motion.div
@@ -811,73 +914,10 @@ export default function App() {
               <div className="card-polish p-8 card-shadow">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xl font-black text-[var(--brand-primary)]">توزيع السكان حسب الولايات ({selectedYear})</h3>
+                    <h3 className={`text-xl font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>توزيع السكان حسب الولايات ({selectedYear})</h3>
                     <p className="text-[10px] text-[var(--text-muted)] font-black">
                        {selectedNatAge === 'omani' ? 'عمانيون' : selectedNatAge === 'expat' ? 'وافدون' : 'إجمالي'} | {selectedGenderAge === 'male' ? 'ذكور' : selectedGenderAge === 'female' ? 'إناث' : 'الكل'}
                     </p>
-                  </div>
-
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {/* Gender Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedGenderAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >الكل</button>
-                      <button 
-                        onClick={() => setSelectedGenderAge('male')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >ذكور</button>
-                      <button 
-                        onClick={() => setSelectedGenderAge('female')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >إناث</button>
-                    </div>
-
-                    {/* Nationality Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedNatAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >إجمالي</button>
-                      <button 
-                        onClick={() => setSelectedNatAge('omani')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >عمانيون</button>
-                      <button 
-                        onClick={() => setSelectedNatAge('expat')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >وافدون</button>
-                    </div>
-
-                    {/* Wilayat Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <select 
-                        value={selectedWilayatAge}
-                        onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                        className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
-                      >
-                        <option value="all">كل الولايات</option>
-                        {DATA_2025.wilayats.map(w => (
-                          <option key={w.name} value={w.name}>{w.name}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedYear('2024')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >2024</button>
-                      <button 
-                        onClick={() => setSelectedYear('2025')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >2025</button>
-                      <button 
-                        onClick={() => setSelectedYear('compare')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >مقارنة</button>
-                    </div>
                   </div>
                 </div>
                 <div className="h-[550px] mt-4">
@@ -957,73 +997,10 @@ export default function App() {
             >
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-xl font-black text-[var(--brand-primary)]">تركيبة السكان (عمانيون vs وافدون) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
+                  <h3 className={`text-xl font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>تركيبة السكان (عمانيون vs وافدون) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
                   <p className="text-[10px] text-[var(--text-muted)] font-bold">
                     فلتر النوع الحالي: {selectedGenderAge === 'male' ? 'ذكور فقط' : selectedGenderAge === 'female' ? 'إناث فقط' : 'الكل'}
                   </p>
-                </div>
-                
-                <div className="flex flex-wrap justify-center gap-4">
-                  {/* Gender Filter */}
-                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                    <button 
-                      onClick={() => setSelectedGenderAge('total')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >الكل</button>
-                    <button 
-                      onClick={() => setSelectedGenderAge('male')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >ذكور</button>
-                    <button 
-                      onClick={() => setSelectedGenderAge('female')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >إناث</button>
-                  </div>
-
-                  {/* Nationality Filter */}
-                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                    <button 
-                      onClick={() => setSelectedNatAge('total')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >إجمالي</button>
-                    <button 
-                      onClick={() => setSelectedNatAge('omani')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >عمانيون</button>
-                    <button 
-                      onClick={() => setSelectedNatAge('expat')}
-                      className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >وافدون</button>
-                  </div>
-
-                  {/* Wilayat Filter */}
-                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                    <select 
-                      value={selectedWilayatAge}
-                      onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                      className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
-                    >
-                      <option value="all">كل الولايات</option>
-                      {DATA_2025.wilayats.map(w => (
-                        <option key={w.name} value={w.name}>{w.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                    <button 
-                      onClick={() => setSelectedYear('2024')}
-                      className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >2024</button>
-                    <button 
-                      onClick={() => setSelectedYear('2025')}
-                      className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >2025</button>
-                    <button 
-                      onClick={() => setSelectedYear('compare')}
-                      className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                    >مقارنة</button>
-                  </div>
                 </div>
               </div>
               <div className="h-[550px]">
@@ -1070,73 +1047,10 @@ export default function App() {
               >
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xl font-black text-[var(--brand-primary)]">توزيع النوع الاجتماعي (ذكور vs إناث) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
+                    <h3 className={`text-xl font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>توزيع النوع الاجتماعي (ذكور vs إناث) - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
                     <p className="text-[10px] text-[var(--text-muted)] font-bold">
                       فلتر الجنسية الحالي: {selectedNatAge === 'omani' ? 'عمانيون فقط' : selectedNatAge === 'expat' ? 'وافدون فقط' : 'الكل'}
                     </p>
-                  </div>
-                  
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {/* Gender Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedGenderAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >الكل</button>
-                      <button 
-                        onClick={() => setSelectedGenderAge('male')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >ذكور</button>
-                      <button 
-                        onClick={() => setSelectedGenderAge('female')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >إناث</button>
-                    </div>
-
-                    {/* Nationality Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedNatAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >إجمالي</button>
-                      <button 
-                        onClick={() => setSelectedNatAge('omani')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >عمانيون</button>
-                      <button 
-                        onClick={() => setSelectedNatAge('expat')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >وافدون</button>
-                    </div>
-
-                    {/* Wilayat Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <select 
-                        value={selectedWilayatAge}
-                        onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                        className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
-                      >
-                        <option value="all">كل الولايات</option>
-                        {DATA_2025.wilayats.map(w => (
-                          <option key={w.name} value={w.name}>{w.name}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedYear('2024')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >2024</button>
-                      <button 
-                        onClick={() => setSelectedYear('2025')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >2025</button>
-                      <button 
-                        onClick={() => setSelectedYear('compare')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >مقارنة</button>
-                    </div>
                   </div>
                 </div>
                 <div className="h-[550px]">
@@ -1182,108 +1096,38 @@ export default function App() {
               >
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xl font-black text-[var(--brand-primary)]">توزيع الفئات العمرية - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
+                    <h3 className={`text-xl font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>توزيع الفئات العمرية - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
                     <p className="text-[10px] text-[var(--text-muted)] font-bold">
                       {selectedWilayatAge === 'all' ? 'عرض إجمالي المحافظة' : `بيانات فعلية لولاية ${selectedWilayatAge}`}
                     </p>
                   </div>
-                  
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {/* Gender Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedGenderAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >الكل</button>
-                      <button 
-                        onClick={() => setSelectedGenderAge('male')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'male' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >ذكور</button>
-                      <button 
-                        onClick={() => setSelectedGenderAge('female')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedGenderAge === 'female' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >إناث</button>
-                    </div>
-
-                    {/* Nationality Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedNatAge('total')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'total' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >إجمالي</button>
-                      <button 
-                        onClick={() => setSelectedNatAge('omani')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'omani' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >عمانيون</button>
-                      <button 
-                        onClick={() => setSelectedNatAge('expat')}
-                        className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${selectedNatAge === 'expat' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >وافدون</button>
-                    </div>
-
-                    {/* Wilayat Filter */}
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)] overflow-x-auto max-w-[300px] no-scrollbar">
-                      <select 
-                        value={selectedWilayatAge}
-                        onChange={(e) => setSelectedWilayatAge(e.target.value)}
-                        className="bg-transparent text-[var(--brand-primary)] text-xs font-black outline-none px-2 py-1 cursor-pointer rtl:pr-0"
-                      >
-                        <option value="all">كل الولايات</option>
-                        {DATA_2025.wilayats.map(w => (
-                          <option key={w.name} value={w.name}>{w.name}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-ui)]">
-                      <button 
-                        onClick={() => setSelectedYear('2024')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2024' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >2024</button>
-                      <button 
-                        onClick={() => setSelectedYear('2025')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === '2025' ? 'bg-[var(--brand-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >2025</button>
-                      <button 
-                        onClick={() => setSelectedYear('compare')}
-                        className={`px-4 py-1 rounded-md text-sm font-black transition-all ${selectedYear === 'compare' ? 'bg-[var(--brand-primary)]/80 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--brand-primary)]'}`}
-                      >مقارنة</button>
-                    </div>
-                  </div>
                 </div>
-                <div className="h-[750px] mt-6">
+                <div className="h-[550px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart
-                      layout="vertical"
                       data={ageGroupData}
-                      margin={{ top: 10, right: 100, left: 40, bottom: 20 }}
+                      margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
-                      <XAxis type="number" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 12 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
-                      <YAxis 
-                        dataKey="range" 
-                        type="category" 
-                        orientation="right"
-                        width={90}
-                        tick={{ fill: 'var(--text-main)', fontWeight: 'bold', fontSize: 13, textAnchor: 'start' }} 
-                        axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} 
-                        tickLine={false}
-                      />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
+                      <XAxis dataKey="range" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                      <YAxis tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', textAlign: 'right' }}
-                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '12px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
+                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
                         formatter={(value) => value?.toLocaleString() ?? '0'} 
                       />
                       <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
                       {selectedYear === 'compare' ? (
                         <>
-                          <Bar dataKey="total_2024" name="إجمالي 2024" fill="#94a3b8" stroke="#475569" strokeWidth={1} barSize={12} radius={[0, 4, 4, 0]} />
-                          <Bar dataKey="total_2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1} barSize={12} radius={[0, 4, 4, 0]} />
+                          <Bar dataKey="total_2024" name="إجمالي 2024" fill="#94a3b8" stroke="#475569" strokeWidth={1.5} />
+                          <Bar dataKey="total_2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1.5} />
+                          <Line type="monotone" dataKey="total_2025" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="منحنى النمو" />
                         </>
                       ) : (
                         <>
-                          <Bar dataKey="male" name="ذكور" stackId="a" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={1} barSize={22} radius={[0, 4, 4, 0]} />
-                          <Bar dataKey="female" name="إناث" stackId="a" fill="#b91c1c" stroke="#7f1d1d" strokeWidth={1} barSize={22} radius={[0, 4, 4, 0]} />
+                          <Bar dataKey="male" name="ذكور" stackId="a" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={2} />
+                          <Bar dataKey="female" name="إناث" stackId="a" fill="#b91c1c" stroke="#7f1d1d" strokeWidth={2} />
+                          <Line type="monotone" dataKey="total" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="توزيع الفئات" />
                         </>
                       )}
                     </ComposedChart>
