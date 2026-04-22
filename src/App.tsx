@@ -61,6 +61,95 @@ const LubanTreeIcon = () => (
   </svg>
 );
 
+const DemographicComparison = ({ wilayat1, wilayat2, data }) => {
+  const w1 = data.wilayats.find(w => w.name === wilayat1);
+  const w2 = data.wilayats.find(w => w.name === wilayat2);
+
+  const calculateAvgAge = (name) => {
+    const ageData = REAL_WILAYAT_AGE_DATA['2025'][name];
+    if (!ageData) return 0;
+    const midpoints = [2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77, 82];
+    let totalAge = 0;
+    let totalPop = 0;
+    ageData.forEach(([m, f], idx) => {
+      totalAge += (m + f) * midpoints[idx];
+      totalPop += (m + f);
+    });
+    return (totalAge / totalPop).toFixed(1);
+  };
+
+  if (!w1 || !w2) return null;
+
+  const avg1 = calculateAvgAge(wilayat1);
+  const avg2 = calculateAvgAge(wilayat2);
+
+  const metrics = [
+    { 
+      label: 'نسبة النوع (ذكر:أنثى)', 
+      v1: (w1.male / w1.female).toFixed(2), 
+      v2: (w2.male / w2.female).toFixed(2),
+      suffix: ': 1'
+    },
+    { 
+      label: 'متوسط العمر (تقديري)', 
+      v1: avg1, 
+      v2: avg2,
+      suffix: ' سنة'
+    },
+    { 
+      label: 'نسبة المواطنين', 
+      v1: ((w1.omani / w1.total) * 100).toFixed(1), 
+      v2: ((w2.omani / w2.total) * 100).toFixed(1),
+      suffix: '%'
+    },
+    { 
+      label: 'الكثافة النسبية', 
+      v1: ((w1.total / data.total) * 100).toFixed(1), 
+      v2: ((w2.total / data.total) * 100).toFixed(1),
+      suffix: '%'
+    }
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="p-4 bg-[var(--brand-primary)]/5 rounded-2xl border-2 border-[var(--brand-primary)]/20 text-center">
+          <span className="text-[10px] font-black text-[var(--brand-primary)] uppercase tracking-widest block mb-1">الولاية الأولى</span>
+          <span className="text-xl font-black text-[var(--brand-primary)]">{wilayat1}</span>
+        </div>
+        <div className="p-4 bg-[var(--brand-accent)]/5 rounded-2xl border-2 border-[var(--brand-accent)]/20 text-center">
+          <span className="text-[10px] font-black text-[var(--brand-accent)] uppercase tracking-widest block mb-1">الولاية الثانية</span>
+          <span className="text-xl font-black text-[var(--brand-accent)]">{wilayat2}</span>
+        </div>
+      </div>
+
+      {metrics.map(m => (
+        <div key={m.label} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+          <div className="text-[10px] font-black text-slate-400 mb-2 text-center uppercase tracking-wider">{m.label}</div>
+          <div className="flex items-center gap-4">
+            <div className="flex-1 text-left">
+              <span className="text-lg font-black text-[var(--brand-primary)]">{m.v1}{m.suffix}</span>
+            </div>
+            <div className="flex-[2] h-2 bg-slate-100 rounded-full overflow-hidden flex">
+               <div 
+                 className="h-full bg-[var(--brand-primary)]" 
+                 style={{ width: `${(Number(m.v1) / (Number(m.v1) + Number(m.v2))) * 100}%` }}
+               />
+               <div 
+                 className="h-full bg-[var(--brand-accent)]" 
+                 style={{ width: `${(Number(m.v2) / (Number(m.v1) + Number(m.v2))) * 100}%` }}
+               />
+            </div>
+            <div className="flex-1 text-right">
+              <span className="text-lg font-black text-[var(--brand-accent)]">{m.v2}{m.suffix}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const AGE_GROUPS_2024 = [
   { range: '0 - 4', male: 20087, female: 19333, total: 39420 },
   { range: '5 - 9', male: 21730, female: 21095, total: 42825 },
@@ -269,6 +358,10 @@ export default function App() {
   const [selectedWilayatAge, setSelectedWilayatAge] = useState('all');
   const [selectedNatAge, setSelectedNatAge] = useState('total');
   const [selectedGenderAge, setSelectedGenderAge] = useState('total');
+  const [highlightedAgeGroup, setHighlightedAgeGroup] = useState<string | null>(null);
+  const [compareWilayat1, setCompareWilayat1] = useState('صلالة');
+  const [compareWilayat2, setCompareWilayat2] = useState('طاقة');
+  const [compositionView, setCompositionView] = useState<'nationality' | 'gender'>('nationality');
 
   const calculateDynamicTotal = useMemo(() => (year: string, wilayatName: string, nationality: string, gender: string) => {
     if (nationality === 'total' && gender === 'total') {
@@ -658,68 +751,120 @@ export default function App() {
                   <div className="absolute -bottom-6 -left-6 opacity-[0.03] scale-150 rotate-12">
                     <KhanjarIcon />
                   </div>
-                  <h3 className={`text-xl font-black text-[var(--brand-primary)] mb-6 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>تحليل التركيبة الديموغرافية والنوع</h3>
-                  <div className="h-[300px] flex items-center justify-around">
-                    <div className="w-1/2 h-full">
+                  <div className="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-[var(--border-ui)] pb-3 gap-4">
+                    <h3 className={`text-xl font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>تحليل التركيبة الديموغرافية والنوع</h3>
+                    <div className="flex p-1 bg-slate-100 rounded-xl">
+                       <button 
+                         onClick={() => setCompositionView('nationality')}
+                         className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${compositionView === 'nationality' ? 'bg-white text-[var(--brand-primary)] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                       >
+                         الجنسية
+                       </button>
+                       <button 
+                         onClick={() => setCompositionView('gender')}
+                         className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${compositionView === 'gender' ? 'bg-white text-[var(--brand-primary)] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                       >
+                         النوع
+                       </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-4">
+                    <div className="w-full md:w-1/2 h-[320px] relative">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
-                            data={[
-                              { name: 'عمانيين', value: wilayatComparison[0]?.omani_2025 || 0 },
-                              { name: 'وافدين', value: wilayatComparison[0]?.expat_2025 || 0 },
+                            data={compositionView === 'nationality' ? [
+                              { name: 'عمانيين', value: wilayatComparison[0]?.omani_2025 || 0, color: '#3b82f6' },
+                              { name: 'وافدين', value: wilayatComparison[0]?.expat_2025 || 0, color: '#ef4444' },
+                            ] : [
+                              { name: 'ذكور', value: wilayatComparison[0]?.male_2025 || 0, color: 'var(--brand-primary)' },
+                              { name: 'إناث', value: wilayatComparison[0]?.female_2025 || 0, color: 'var(--brand-accent)' },
                             ]}
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
+                            innerRadius={85}
+                            outerRadius={115}
+                            paddingAngle={8}
                             dataKey="value"
                             nameKey="name"
+                            animationBegin={0}
+                            animationDuration={1500}
                           >
-                            <Cell fill="#3b82f6" strokeWidth={2} stroke="#fff" />
-                            <Cell fill="#ef4444" strokeWidth={2} stroke="#fff" />
+                            {(compositionView === 'nationality' ? [
+                              { name: 'عمانيين', color: '#3b82f6' },
+                              { name: 'وافدين', color: '#ef4444' },
+                            ] : [
+                              { name: 'ذكور', color: 'var(--brand-primary)' },
+                              { name: 'إناث', color: 'var(--brand-accent)' },
+                            ]).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} className="drop-shadow-lg hover:opacity-80 transition-opacity cursor-pointer" />
+                            ))}
                             <Label 
                               position="center"
-                              content={(props) => (
-                                <text x={props.viewBox.cx} y={props.viewBox.cy} textAnchor="middle" dominantBaseline="middle">
-                                  <tspan x={props.viewBox.cx} dy="-0.5em" fontSize="10" fill="var(--text-muted)" fontWeight="bold">الجنسية</tspan>
-                                  <tspan x={props.viewBox.cx} dy="1.5em" fontSize="14" fill="var(--brand-primary)" fontWeight="black">2025</tspan>
-                                </text>
-                              )}
+                              content={(props) => {
+                                const total = (compositionView === 'nationality' 
+                                  ? (wilayatComparison[0]?.omani_2025 || 0) + (wilayatComparison[0]?.expat_2025 || 0)
+                                  : (wilayatComparison[0]?.male_2025 || 0) + (wilayatComparison[0]?.female_2025 || 0));
+                                return (
+                                  <text x={props.viewBox.cx} y={props.viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                                    <tspan x={props.viewBox.cx} dy="-0.5em" fontSize="12" fill="var(--text-muted)" fontWeight="bold" className="uppercase tracking-widest">{compositionView === 'nationality' ? 'إجمالي السكان' : 'إجمالي النوع'}</tspan>
+                                    <tspan x={props.viewBox.cx} dy="1.5em" fontSize="24" fill="var(--brand-primary)" fontWeight="900">{total.toLocaleString()}</tspan>
+                                  </text>
+                                );
+                              }}
                             />
                           </Pie>
-                          <Tooltip />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: 'white', borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', padding: '12px' }}
+                            itemStyle={{ fontWeight: '900', fontSize: '14px' }}
+                            formatter={(value: any) => [value.toLocaleString(), 'نسمة']}
+                          />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
 
-                    <div className="w-1/2 h-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={[
-                              { name: 'ذكور', value: wilayatComparison[0]?.male_2025 || 0 },
-                              { name: 'إناث', value: wilayatComparison[0]?.female_2025 || 0 },
-                            ]}
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="value"
-                            nameKey="name"
-                          >
-                            <Cell fill="var(--brand-primary)" strokeWidth={2} stroke="#fff" />
-                            <Cell fill="var(--brand-accent)" strokeWidth={2} stroke="#fff" />
-                            <Label 
-                              position="center"
-                              content={(props) => (
-                                <text x={props.viewBox.cx} y={props.viewBox.cy} textAnchor="middle" dominantBaseline="middle">
-                                  <tspan x={props.viewBox.cx} dy="-0.5em" fontSize="10" fill="var(--text-muted)" fontWeight="bold">النوع</tspan>
-                                  <tspan x={props.viewBox.cx} dy="1.5em" fontSize="14" fill="var(--brand-primary)" fontWeight="black">2025</tspan>
-                                </text>
-                              )}
-                            />
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
+                    <div className="w-full md:w-1/2 space-y-4">
+                       {/* Custom Interactive Legend */}
+                       {(compositionView === 'nationality' ? [
+                         { 
+                           label: 'المواطنون العمانيون', 
+                           count: wilayatComparison[0]?.omani_2025 || 0, 
+                           percent: ((wilayatComparison[0]?.omani_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1),
+                           color: 'bg-blue-600',
+                           desc: 'يشمل كافة المواطنين المسجلين في السجل المدني للولاية المختارة.'
+                         },
+                         { 
+                           label: 'المقيمون الوافدون', 
+                           count: wilayatComparison[0]?.expat_2025 || 0, 
+                           percent: ((wilayatComparison[0]?.expat_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1),
+                           color: 'bg-red-600',
+                           desc: 'يشمل المقيمين من مختلف الجنسيات وفق بيانات الإقامة.'
+                         }
+                       ] : [
+                         { 
+                           label: 'إحصائيات الذكور', 
+                           count: wilayatComparison[0]?.male_2025 || 0, 
+                           percent: ((wilayatComparison[0]?.male_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1),
+                           color: 'bg-[var(--brand-primary)]',
+                           desc: 'توزيع السكان الذكور المسجلين للعام 2025.'
+                         },
+                         { 
+                           label: 'إحصائيات الإناث', 
+                           count: wilayatComparison[0]?.female_2025 || 0, 
+                           percent: ((wilayatComparison[0]?.female_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1),
+                           color: 'bg-[var(--brand-accent)]',
+                           desc: 'توزيع السكان الإناث المسجلات للعام 2025.'
+                         }
+                       ]).map((item, idx) => (
+                         <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-all hover:shadow-md hover:translate-x-[-4px]">
+                            <div className="flex items-center gap-3 mb-2">
+                               <div className={`w-3 h-3 rounded-full ${item.color} shadow-sm animate-pulse`}></div>
+                               <span className="text-sm font-black text-slate-800">{item.label}</span>
+                               <span className="mr-auto text-sm font-black text-[var(--brand-primary)]">{item.percent}%</span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 font-bold leading-relaxed mb-1">{item.desc}</p>
+                            <div className="text-[12px] font-black text-slate-600">{item.count.toLocaleString()} نسمة</div>
+                         </div>
+                       ))}
                     </div>
                   </div>
                 </div>
@@ -740,6 +885,29 @@ export default function App() {
                       <div className="text-[10px] text-red-700 font-bold mt-1">نسبة الوافدين المقيمين في {selectedWilayatAge === 'all' ? 'المحافظة' : 'الولاية'}.</div>
                     </div>
                   </div>
+                </div>
+
+                <div className="card-polish p-6 card-shadow">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className={`text-lg font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>مقارنة ديموغرافية بين الولايات</h3>
+                    <div className="flex gap-2">
+                       <select 
+                         value={compareWilayat1}
+                         onChange={(e) => setCompareWilayat1(e.target.value)}
+                         className="px-3 py-1 bg-[var(--bg-surface)] border border-[var(--border-ui)] rounded-lg text-xs font-black text-[var(--brand-primary)] outline-none"
+                       >
+                         {DATA_2025.wilayats.map(w => <option key={w.name} value={w.name}>{w.name}</option>)}
+                       </select>
+                       <select 
+                         value={compareWilayat2}
+                         onChange={(e) => setCompareWilayat2(e.target.value)}
+                         className="px-3 py-1 bg-[var(--bg-surface)] border border-[var(--border-ui)] rounded-lg text-xs font-black text-[var(--brand-accent)] outline-none"
+                       >
+                         {DATA_2025.wilayats.map(w => <option key={w.name} value={w.name}>{w.name}</option>)}
+                       </select>
+                    </div>
+                  </div>
+                  <DemographicComparison wilayat1={compareWilayat1} wilayat2={compareWilayat2} data={DATA_2025} />
                 </div>
               </div>
             </motion.div>
@@ -1158,47 +1326,125 @@ export default function App() {
                 key="age"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card-polish p-8 card-shadow"
+                className="space-y-6"
               >
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
-                  <div className="flex flex-col gap-1">
-                    <h3 className={`text-xl font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>توزيع الفئات العمرية - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
-                    <p className="text-[10px] text-[var(--text-muted)] font-bold">
-                      {selectedWilayatAge === 'all' ? 'عرض إجمالي المحافظة' : `بيانات فعلية لولاية ${selectedWilayatAge}`}
-                    </p>
+                <div className="card-polish p-8 card-shadow">
+                  <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-[var(--border-ui)] pb-4 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <h3 className={`text-xl font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>تحليل الفئات العمرية - {selectedYear === 'compare' ? 'مقارنة' : selectedYear}</h3>
+                      <p className="text-[10px] text-[var(--text-muted)] font-black">
+                        {selectedWilayatAge === 'all' ? 'عرض إجمالي المحافظة' : `بيانات لولاية ${selectedWilayatAge}`}
+                        {highlightedAgeGroup && <span className="mr-2 text-[var(--brand-accent)] font-black">| فئة مختارة: {highlightedAgeGroup}</span>}
+                      </p>
+                    </div>
+                    {highlightedAgeGroup && (
+                      <button 
+                        onClick={() => setHighlightedAgeGroup(null)}
+                        className="px-4 py-2 bg-emerald-50 text-emerald-700 text-xs font-black rounded-lg border border-emerald-100 hover:bg-emerald-100 transition-colors"
+                      >
+                        إلغاء التحديد
+                      </button>
+                    )}
+                  </div>
+                  <div className="h-[500px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart
+                        data={ageGroupData}
+                        margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
+                        onClick={(data) => {
+                          if (data && data.activeLabel) {
+                            setHighlightedAgeGroup(data.activeLabel);
+                          }
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
+                        <XAxis dataKey="range" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                        <YAxis tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
+                          itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
+                          formatter={(value) => value?.toLocaleString() ?? '0'} 
+                        />
+                        <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
+                        {selectedYear === 'compare' ? (
+                          <>
+                            <Bar 
+                              dataKey="total_2024" 
+                              name="إجمالي 2024" 
+                              fill="#94a3b8" 
+                              stroke="#475569" 
+                              strokeWidth={1.5}
+                              fillOpacity={highlightedAgeGroup ? (d => d.range === highlightedAgeGroup ? 1 : 0.3) : 1}
+                            />
+                            <Bar 
+                              dataKey="total_2025" 
+                              name="إجمالي 2025" 
+                              fill="#ef4444" 
+                              stroke="#991b1b" 
+                              strokeWidth={1.5}
+                              fillOpacity={highlightedAgeGroup ? (d => d.range === highlightedAgeGroup ? 1 : 0.3) : 1}
+                            />
+                            <Line type="monotone" dataKey="total_2025" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="منحنى النمو" />
+                          </>
+                        ) : (
+                          <>
+                            <Bar 
+                              dataKey="male" 
+                              name="ذكور" 
+                              stackId="a" 
+                              fill="#3b82f6" 
+                              stroke="#1d4ed8" 
+                              strokeWidth={2}
+                              fillOpacity={highlightedAgeGroup ? (d => d.range === highlightedAgeGroup ? 1 : 0.3) : 1}
+                            />
+                            <Bar 
+                              dataKey="female" 
+                              name="إناث" 
+                              stackId="a" 
+                              fill="#b91c1c" 
+                              stroke="#7f1d1d" 
+                              strokeWidth={2}
+                              fillOpacity={highlightedAgeGroup ? (d => d.range === highlightedAgeGroup ? 1 : 0.3) : 1}
+                            />
+                            <Line type="monotone" dataKey="total" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="توزيع الفئات" />
+                          </>
+                        )}
+                      </ComposedChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
-                <div className="h-[550px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart
-                      data={ageGroupData}
-                      margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-ui)" strokeWidth={1} />
-                      <XAxis dataKey="range" tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
-                      <YAxis tick={{ fill: 'var(--text-muted)', fontWeight: '700', fontSize: 13 }} axisLine={{ stroke: 'var(--brand-primary)', strokeWidth: 1.5 }} />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--brand-primary)', borderRadius: '12px', fontWeight: 'bold' }}
-                        itemStyle={{ color: 'var(--brand-primary)', fontSize: '14px' }}
-                        formatter={(value) => value?.toLocaleString() ?? '0'} 
-                      />
-                      <Legend verticalAlign="top" height={40} wrapperStyle={{ fontWeight: '900', color: 'var(--brand-primary)', fontSize: '14px' }} formatter={(value) => <span className="mx-3">{value}</span>} />
-                      {selectedYear === 'compare' ? (
+
+                {highlightedAgeGroup && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                  >
+                    {(() => {
+                      const group = ageGroupData.find(d => d.range === highlightedAgeGroup);
+                      if (!group) return null;
+                      return (
                         <>
-                          <Bar dataKey="total_2024" name="إجمالي 2024" fill="#94a3b8" stroke="#475569" strokeWidth={1.5} />
-                          <Bar dataKey="total_2025" name="إجمالي 2025" fill="#ef4444" stroke="#991b1b" strokeWidth={1.5} />
-                          <Line type="monotone" dataKey="total_2025" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="منحنى النمو" />
+                          <div className="card-polish p-6 card-shadow border-t-4 border-blue-600">
+                             <div className="text-[10px] font-black text-slate-400 uppercase mb-2">إحصائيات الذكور ({highlightedAgeGroup})</div>
+                             <div className="text-3xl font-black text-blue-900">{group.male?.toLocaleString() ?? 0}</div>
+                             <div className="text-[10px] font-bold text-blue-600 mt-1">نسبة المشاركة: {((group.male / group.total) * 100).toFixed(1)}%</div>
+                          </div>
+                          <div className="card-polish p-6 card-shadow border-t-4 border-red-700">
+                             <div className="text-[10px] font-black text-slate-400 uppercase mb-2">إحصائيات الإناث ({highlightedAgeGroup})</div>
+                             <div className="text-3xl font-black text-red-900">{group.female?.toLocaleString() ?? 0}</div>
+                             <div className="text-[10px] font-bold text-red-700 mt-1">نسبة المشاركة: {((group.female / group.total) * 100).toFixed(1)}%</div>
+                          </div>
+                          <div className="card-polish p-6 card-shadow border-t-4 border-[var(--brand-primary)]">
+                             <div className="text-[10px] font-black text-slate-400 uppercase mb-2">إجمالي الفئة ({highlightedAgeGroup})</div>
+                             <div className="text-3xl font-black text-[var(--brand-primary)]">{group.total?.toLocaleString() ?? 0}</div>
+                             <div className="text-[10px] font-bold text-[var(--brand-primary)] mt-1">من إجمالي السكان المفلترين</div>
+                          </div>
                         </>
-                      ) : (
-                        <>
-                          <Bar dataKey="male" name="ذكور" stackId="a" fill="#3b82f6" stroke="#1d4ed8" strokeWidth={2} />
-                          <Bar dataKey="female" name="إناث" stackId="a" fill="#b91c1c" stroke="#7f1d1d" strokeWidth={2} />
-                          <Line type="monotone" dataKey="total" stroke="var(--brand-primary)" strokeWidth={4} dot={{ r: 6, fill: 'var(--brand-primary)', strokeWidth: 2, stroke: '#fff' }} name="توزيع الفئات" />
-                        </>
-                      )}
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </div>
+                      );
+                    })()}
+                  </motion.div>
+                )}
               </motion.div>
             )}
         </AnimatePresence>
