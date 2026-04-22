@@ -474,8 +474,8 @@ export default function App() {
         {/* Navigation Tabs */}
         <nav className="relative z-10 flex flex-wrap justify-center mb-10 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-ui)] gap-1 shadow-sm max-w-4xl mx-auto">
           {[
-            { id: 'overview', label: 'التقرير الشامل', icon: <PieChartIcon size={18} /> },
-            { id: 'analysis', label: 'التحليل المقارن', icon: <TrendingUp size={18} /> },
+            { id: 'overview', label: 'مؤشرات التعداد السكاني', icon: <PieChartIcon size={18} /> },
+            { id: 'analysis', label: 'لوحة المقارنة الديموغرافية', icon: <TrendingUp size={18} /> },
             { id: 'wilayats', label: 'توزيع الولايات', icon: <MapPin size={18} /> },
             { id: 'age', label: 'الفئات العمرية', icon: <BarChartIcon size={18} /> },
             { id: 'gender', label: 'توزيع النوع', icon: <Users size={18} /> },
@@ -497,78 +497,80 @@ export default function App() {
         </nav>
 
         {/* Global Filter Bar - Centralized for all tabs */}
-        <div className="relative z-20 sticky top-4 mb-4 flex flex-wrap justify-center gap-3 bg-[var(--bg-card)]/80 backdrop-blur-md p-3 rounded-2xl border border-[var(--border-ui)] shadow-lg max-w-fit mx-auto">
-          <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
-            <MapPin size={16} className="text-[var(--brand-primary)]" />
-            <select 
-              value={selectedWilayatAge}
-              onChange={(e) => setSelectedWilayatAge(e.target.value)}
-              className="bg-transparent text-[var(--brand-primary)] text-sm font-black outline-none cursor-pointer rtl:pr-1"
-            >
-              <option value="all">كل الولايات (المحافظة)</option>
-              {DATA_2025.wilayats.map(w => (
-                <option key={w.name} value={w.name}>{w.name}</option>
-              ))}
-            </select>
-          </div>
+        {activeTab !== 'overview' && (
+          <div className="relative z-20 sticky top-4 mb-4 flex flex-wrap justify-center gap-3 bg-[var(--bg-card)]/80 backdrop-blur-md p-3 rounded-2xl border border-[var(--border-ui)] shadow-lg max-w-fit mx-auto">
+            <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
+              <MapPin size={16} className="text-[var(--brand-primary)]" />
+              <select 
+                value={selectedWilayatAge}
+                onChange={(e) => setSelectedWilayatAge(e.target.value)}
+                className="bg-transparent text-[var(--brand-primary)] text-sm font-black outline-none cursor-pointer rtl:pr-1"
+              >
+                <option value="all">كل الولايات (المحافظة)</option>
+                {DATA_2025.wilayats.map(w => (
+                  <option key={w.name} value={w.name}>{w.name}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
-            <Calendar size={16} className="text-[var(--brand-primary)]" />
-            <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
-              {['2024', '2025', 'compare'].map(y => (
-                <button
-                  key={y}
-                  onClick={() => setSelectedYear(y)}
-                  className={`px-3 py-1 text-xs font-black transition-all ${
-                    selectedYear === y 
-                      ? 'bg-[var(--brand-primary)] text-white' 
-                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
-                  }`}
-                >
-                  {y === 'compare' ? 'مقارنة' : y}
-                </button>
-              ))}
+            <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
+              <Calendar size={16} className="text-[var(--brand-primary)]" />
+              <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
+                {['2024', '2025', 'compare'].map(y => (
+                  <button
+                    key={y}
+                    onClick={() => setSelectedYear(y)}
+                    className={`px-3 py-1 text-xs font-black transition-all ${
+                      selectedYear === y 
+                        ? 'bg-[var(--brand-primary)] text-white' 
+                        : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
+                    }`}
+                  >
+                    {y === 'compare' ? 'مقارنة' : y}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
+              <Users size={16} className="text-[var(--brand-primary)]" />
+              <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
+                {['total', 'omani', 'expat'].map(n => (
+                  <button
+                    key={n}
+                    onClick={() => setSelectedNatAge(n)}
+                    className={`px-3 py-1 text-xs font-black transition-all ${
+                      selectedNatAge === n 
+                        ? 'bg-[var(--brand-primary)] text-white' 
+                        : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
+                    }`}
+                  >
+                    {n === 'total' ? 'إجمالي' : n === 'omani' ? 'عمانيون' : 'وافدون'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <Activity size={16} className="text-[var(--brand-primary)]" />
+              <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
+                {['total', 'male', 'female'].map(g => (
+                  <button
+                    key={g}
+                    onClick={() => setSelectedGenderAge(g)}
+                    className={`px-3 py-1 text-xs font-black transition-all ${
+                      selectedGenderAge === g 
+                        ? 'bg-[var(--brand-primary)] text-white' 
+                        : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
+                    }`}
+                  >
+                    {g === 'total' ? 'الكل' : g === 'male' ? 'ذكور' : 'إناث'}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
-            <Users size={16} className="text-[var(--brand-primary)]" />
-            <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
-              {['total', 'omani', 'expat'].map(n => (
-                <button
-                  key={n}
-                  onClick={() => setSelectedNatAge(n)}
-                  className={`px-3 py-1 text-xs font-black transition-all ${
-                    selectedNatAge === n 
-                      ? 'bg-[var(--brand-primary)] text-white' 
-                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
-                  }`}
-                >
-                  {n === 'total' ? 'إجمالي' : n === 'omani' ? 'عمانيون' : 'وافدون'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Activity size={16} className="text-[var(--brand-primary)]" />
-            <div className="flex rounded-lg overflow-hidden border border-[var(--border-ui)]">
-              {['total', 'male', 'female'].map(g => (
-                <button
-                  key={g}
-                  onClick={() => setSelectedGenderAge(g)}
-                  className={`px-3 py-1 text-xs font-black transition-all ${
-                    selectedGenderAge === g 
-                      ? 'bg-[var(--brand-primary)] text-white' 
-                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
-                  }`}
-                >
-                  {g === 'total' ? 'الكل' : g === 'male' ? 'ذكور' : 'إناث'}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        )}
 
         <AnimatePresence mode="wait">
           {activeTab === 'analysis' && (
@@ -656,56 +658,87 @@ export default function App() {
                   <div className="absolute -bottom-6 -left-6 opacity-[0.03] scale-150 rotate-12">
                     <KhanjarIcon />
                   </div>
-                  <h3 className={`text-xl font-black text-[var(--brand-primary)] mb-6 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>تحليل التركيبة الديموغرافية</h3>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={[
-                            { name: 'عمانيين', value: wilayatComparison[0]?.omani_2025 || 0 },
-                            { name: 'وافدين', value: wilayatComparison[0]?.expat_2025 || 0 },
-                          ]}
-                          innerRadius={80}
-                          outerRadius={100}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          <Cell fill="#3b82f6" strokeWidth={2} stroke="#fff" />
-                          <Cell fill="#ef4444" strokeWidth={2} stroke="#fff" />
-                          <Label 
-                            position="center"
-                            content={(props) => (
-                              <text x={props.viewBox.cx} y={props.viewBox.cy} textAnchor="middle" dominantBaseline="middle">
-                                <tspan x={props.viewBox.cx} dy="-0.5em" fontSize="12" fill="var(--text-muted)" fontWeight="bold">إجمالي</tspan>
-                                <tspan x={props.viewBox.cx} dy="1.5em" fontSize="20" fill="var(--brand-primary)" fontWeight="black">{wilayatComparison[0]?.['2025']?.toLocaleString()}</tspan>
-                              </text>
-                            )}
-                          />
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
+                  <h3 className={`text-xl font-black text-[var(--brand-primary)] mb-6 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>تحليل التركيبة الديموغرافية والنوع</h3>
+                  <div className="h-[300px] flex items-center justify-around">
+                    <div className="w-1/2 h-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: 'عمانيين', value: wilayatComparison[0]?.omani_2025 || 0 },
+                              { name: 'وافدين', value: wilayatComparison[0]?.expat_2025 || 0 },
+                            ]}
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            nameKey="name"
+                          >
+                            <Cell fill="#3b82f6" strokeWidth={2} stroke="#fff" />
+                            <Cell fill="#ef4444" strokeWidth={2} stroke="#fff" />
+                            <Label 
+                              position="center"
+                              content={(props) => (
+                                <text x={props.viewBox.cx} y={props.viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                                  <tspan x={props.viewBox.cx} dy="-0.5em" fontSize="10" fill="var(--text-muted)" fontWeight="bold">الجنسية</tspan>
+                                  <tspan x={props.viewBox.cx} dy="1.5em" fontSize="14" fill="var(--brand-primary)" fontWeight="black">2025</tspan>
+                                </text>
+                              )}
+                            />
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    <div className="w-1/2 h-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: 'ذكور', value: wilayatComparison[0]?.male_2025 || 0 },
+                              { name: 'إناث', value: wilayatComparison[0]?.female_2025 || 0 },
+                            ]}
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            nameKey="name"
+                          >
+                            <Cell fill="var(--brand-primary)" strokeWidth={2} stroke="#fff" />
+                            <Cell fill="var(--brand-accent)" strokeWidth={2} stroke="#fff" />
+                            <Label 
+                              position="center"
+                              content={(props) => (
+                                <text x={props.viewBox.cx} y={props.viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                                  <tspan x={props.viewBox.cx} dy="-0.5em" fontSize="10" fill="var(--text-muted)" fontWeight="bold">النوع</tspan>
+                                  <tspan x={props.viewBox.cx} dy="1.5em" fontSize="14" fill="var(--brand-primary)" fontWeight="black">2025</tspan>
+                                </text>
+                              )}
+                            />
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="card-polish p-6 card-shadow">
-                <h3 className={`text-lg font-black text-[var(--brand-primary)] mb-4 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>ملخص التغيرات البارزة</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
-                    <div className="text-emerald-600 font-black text-sm mb-1">أعلى نمو</div>
-                    <div className="text-lg font-bold">{wilayatComparison[0]?.name}</div>
-                    <div className="text-xs text-[var(--text-muted)] mt-1">سجلت هذه الولاية تغيراً بنسبة {wilayatComparison[0]?.growth}% خلال العام.</div>
-                  </div>
-                  <div className="bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
-                    <div className="text-blue-600 font-black text-sm mb-1">التوازن الوطني</div>
-                    <div className="text-lg font-bold">{((wilayatComparison[0]?.omani_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1)}%</div>
-                    <div className="text-xs text-[var(--text-muted)] mt-1">نسبة المواطنين العمانيين من إجمالي سكان الولاية في 2025.</div>
-                  </div>
-                  <div className="bg-[var(--bg-surface)] p-4 rounded-xl border border-[var(--border-ui)]">
-                    <div className="text-red-600 font-black text-sm mb-1">القوى العاملة الوافدة</div>
-                    <div className="text-lg font-bold">{((wilayatComparison[0]?.expat_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1)}%</div>
-                    <div className="text-xs text-[var(--text-muted)] mt-1">نسبة الوافدين المقيمين في الولاية حسب بيانات 2025.</div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="card-polish p-6 card-shadow">
+                  <h3 className={`text-lg font-black text-[var(--brand-primary)] mb-4 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>ملخص التغيرات البارزة</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+                      <div className="text-blue-600 font-black text-sm mb-1">التوازن الوطني</div>
+                      <div className="text-2xl font-black text-blue-900">{((wilayatComparison[0]?.omani_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1)}%</div>
+                      <div className="text-[10px] text-blue-700 font-bold mt-1">نسبة المواطنين العمانيين من إجمالي سكان {selectedWilayatAge === 'all' ? 'المحافظة' : 'الولاية'}.</div>
+                    </div>
+                    <div className="p-4 rounded-xl bg-red-50 border border-red-100">
+                      <div className="text-red-600 font-black text-sm mb-1">القوى العاملة الوافدة</div>
+                      <div className="text-2xl font-black text-red-900">{((wilayatComparison[0]?.expat_2025 || 0) / (wilayatComparison[0]?.['2025'] || 1) * 100).toFixed(1)}%</div>
+                      <div className="text-[10px] text-red-700 font-bold mt-1">نسبة الوافدين المقيمين في {selectedWilayatAge === 'all' ? 'المحافظة' : 'الولاية'}.</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -839,59 +872,92 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Insights Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* 1. Wilayats Insight */}
-                <div className="card-polish p-5 card-shadow border-r-4 border-[var(--brand-primary)] group hover:bg-[var(--brand-primary)] hover:text-white transition-all duration-300">
-                  <div className="flex items-center gap-2 mb-3">
-                    <MapPin size={18} className="group-hover:text-white text-[var(--brand-primary)]" />
-                    <h4 className="font-black text-sm">تحليل الولايات</h4>
+              {/* Top 5 Growth Wilayats & Insights */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="card-polish p-6 card-shadow lg:col-span-1">
+                  <h3 className={`text-lg font-black text-[var(--brand-primary)] mb-4 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>أبرز الولايات نمواً للسكان</h3>
+                  <div className="space-y-3">
+                    {[...DATA_2025.wilayats]
+                      .map(w => {
+                        const prev = DATA_2024.wilayats.find(p => p.name === w.name);
+                        const growth = prev ? ((w.total - prev.total) / prev.total * 100).toFixed(1) : '0';
+                        return { name: w.name, growth: parseFloat(growth), current: w.total, prev: prev?.total || 1 };
+                      })
+                      .sort((a, b) => b.growth - a.growth)
+                      .slice(0, 5)
+                      .map((w, idx) => (
+                        <div key={w.name} className="flex items-center justify-between p-3 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-ui)]">
+                          <div className="flex items-center gap-3">
+                            <span className="w-6 h-6 flex items-center justify-center bg-[var(--brand-primary)] text-white rounded-full text-xs font-black">{idx + 1}</span>
+                            <span className="font-bold text-[var(--text-main)] text-xs italic">{w.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-right">
+                              <div className="text-[8px] text-[var(--text-muted)] font-bold">الزيادة</div>
+                              <div className="text-[10px] font-black text-emerald-600">+{ (w.current - w.prev).toLocaleString() }</div>
+                            </div>
+                            <div className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-lg text-[10px] font-black">
+                              {w.growth}%
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                   </div>
-                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
-                    سجلت ولاية <span className="font-bold">شليم</span> أعلى نمو بنسبة 11.3%، بينما شهدت <span className="font-bold">المزيونة</span> استقراراً للمواطنين بزيادة 7.0%.
-                  </p>
                 </div>
 
-                {/* 2. Age Insight */}
-                <div className="card-polish p-5 card-shadow border-r-4 border-amber-500 group hover:bg-amber-600 hover:text-white transition-all duration-300">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Activity size={18} className="group-hover:text-white text-amber-600" />
-                    <h4 className="font-black text-sm">الفئات العمرية</h4>
+                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* 1. Wilayats Insight */}
+                  <div className="card-polish p-5 card-shadow border-r-4 border-[var(--brand-primary)] group hover:bg-[var(--brand-primary)] hover:text-white transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin size={18} className="group-hover:text-white text-[var(--brand-primary)]" />
+                      <h4 className="font-black text-sm">تحليل الولايات</h4>
+                    </div>
+                    <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                      سجلت ولاية <span className="font-bold">شليم</span> أعلى نمو بنسبة 11.3%، بينما شهدت <span className="font-bold">المزيونة</span> استقراراً للمواطنين بزيادة 7.0%.
+                    </p>
                   </div>
-                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
-                    المجتمع في محافظة ظفار يتسم بالفتوة، حيث تشكل الفئة العمرية <span className="font-bold">15-44 سنة</span> الركيزة الأساسية للتركيبة السكانية.
-                  </p>
-                </div>
 
-                {/* 3. Gender Insight */}
-                <div className="card-polish p-5 card-shadow border-r-4 border-emerald-500 group hover:bg-emerald-600 hover:text-white transition-all duration-300">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users size={18} className="group-hover:text-white text-emerald-600" />
-                    <h4 className="font-black text-sm">التوازن النوعي</h4>
+                  {/* 2. Age Insight */}
+                  <div className="card-polish p-5 card-shadow border-r-4 border-amber-500 group hover:bg-amber-600 hover:text-white transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Activity size={18} className="group-hover:text-white text-amber-600" />
+                      <h4 className="font-black text-sm">الفئات العمرية</h4>
+                    </div>
+                    <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                      المجتمع في محافظة ظفار يتسم بالفتوة، حيث تشكل الفئة العمرية <span className="font-bold">15-44 سنة</span> الركيزة الأساسية للتركيبة السكانية.
+                    </p>
                   </div>
-                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
-                    توازن مثالي بين المواطنين (51% ذكور / 49% إناث)، مع تحسن في أعداد الإناث المواطنات بنسبة نمو بلغت 3.1%.
-                  </p>
-                </div>
 
-                {/* 4. Composition Insight */}
-                <div className="card-polish p-5 card-shadow border-r-4 border-blue-500 group hover:bg-blue-600 hover:text-white transition-all duration-300">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Globe size={18} className="group-hover:text-white text-blue-600" />
-                    <h4 className="font-black text-sm">تركيبة السكان</h4>
+                  {/* 3. Gender Insight */}
+                  <div className="card-polish p-5 card-shadow border-r-4 border-emerald-500 group hover:bg-emerald-600 hover:text-white transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users size={18} className="group-hover:text-white text-emerald-600" />
+                      <h4 className="font-black text-sm">التوازن النوعي</h4>
+                    </div>
+                    <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                      توازن مثالي بين المواطنين (51% ذكور / 49% إناث)، مع تحسن في أعداد الإناث المواطنات بنسبة نمو بلغت 3.1%.
+                    </p>
                   </div>
-                  <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
-                    ارتفعت حصة المواطنين إلى <span className="font-bold">45.9%</span>، مما يعكس نجاح سياسات التوطين والاستقرار السكاني في المحافظة.
-                  </p>
+
+                  {/* 4. Composition Insight */}
+                  <div className="card-polish p-5 card-shadow border-r-4 border-blue-500 group hover:bg-blue-600 hover:text-white transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Globe size={18} className="group-hover:text-white text-blue-600" />
+                      <h4 className="font-black text-sm">تركيبة السكان</h4>
+                    </div>
+                    <p className="text-[11px] leading-relaxed opacity-90 group-hover:text-white text-[var(--text-muted)]">
+                      ارتفعت حصة المواطنين إلى <span className="font-bold">45.9%</span>، مما يعكس نجاح سياسات التوطين والاستقرار السكاني في المحافظة.
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Secondary Context Bar */}
               <div className="card-polish p-4 border border-[var(--border-ui)] border-dashed flex justify-between items-center bg-gray-50/30">
                  <div className="flex items-center gap-4">
-                    <div className="text-[10px] font-bold text-[var(--text-muted)] italic">أهم الولايات نمواً:</div>
+                    <div className="text-[10px] font-bold text-[var(--text-muted)] italic">أبرز الولايات نمواً للسكان:</div>
                     <div className="flex gap-4">
-                       {wilayatComparison.slice(0, 3).map(w => (
+                       {wilayatComparison.slice(0, 5).map(w => (
                          <div key={w.name} className="flex items-center gap-1">
                            <span className="text-[11px] font-black">{w.name}</span>
                            <span className="text-[11px] font-bold text-red-700">({w.growth}%)</span>
@@ -1144,7 +1210,6 @@ export default function App() {
           <LubanTreeIcon />
           <div className="text-right">
             <p className="font-bold text-[var(--brand-primary)]">محافظة ظفار</p>
-            <p className="text-xs text-[var(--text-muted)]">Census Report 2025</p>
           </div>
         </div>
         <div className="text-center text-[10px] text-[var(--text-muted)]">
