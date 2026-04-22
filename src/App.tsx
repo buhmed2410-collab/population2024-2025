@@ -472,7 +472,7 @@ export default function App() {
 
       <main className="relative z-10 max-w-7xl mx-auto">
         {/* Navigation Tabs */}
-        <nav className="relative z-10 flex flex-wrap justify-center mb-10 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-ui)] gap-1 shadow-sm max-w-4xl mx-auto">
+        <nav className="relative z-10 flex flex-nowrap items-center justify-start lg:justify-center overflow-x-auto no-scrollbar mb-10 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-ui)] gap-1 shadow-sm mx-auto w-full max-w-full lg:max-w-max">
           {[
             { id: 'overview', label: 'مؤشرات التعداد السكاني', icon: <PieChartIcon size={18} /> },
             { id: 'analysis', label: 'لوحة المقارنة الديموغرافية', icon: <TrendingUp size={18} /> },
@@ -484,7 +484,7 @@ export default function App() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 ${
+              className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 whitespace-nowrap shrink-0 ${
                 activeTab === tab.id 
                   ? 'bg-[var(--brand-primary)] text-white shadow-lg scale-105' 
                   : 'text-[var(--text-muted)] hover:bg-[var(--bg-card)]'
@@ -498,7 +498,7 @@ export default function App() {
 
         {/* Global Filter Bar - Centralized for all tabs */}
         {activeTab !== 'overview' && (
-          <div className="relative z-20 sticky top-4 mb-4 flex flex-wrap justify-center gap-3 bg-[var(--bg-card)]/80 backdrop-blur-md p-3 rounded-2xl border border-[var(--border-ui)] shadow-lg max-w-fit mx-auto">
+          <div className="relative z-20 sticky top-4 mb-4 flex flex-nowrap items-center justify-start lg:justify-center gap-3 bg-[var(--bg-card)]/80 backdrop-blur-md p-3 rounded-2xl border border-[var(--border-ui)] shadow-lg max-w-full overflow-x-auto no-scrollbar mx-auto">
             <div className="flex items-center gap-2 border-l border-[var(--border-ui)] pl-3 ml-1">
               <MapPin size={16} className="text-[var(--brand-primary)]" />
               <select 
