@@ -38,7 +38,8 @@ import {
   Globe,
   PieChart as PieChartIcon,
   BarChart as BarChartIcon,
-  FileText
+  FileText,
+  ChevronDown
 } from 'lucide-react';
 
 // --- Icons & Decorative Elements ---
@@ -60,6 +61,94 @@ const LubanTreeIcon = () => (
     <circle cx="50" cy="15" r="6" fill="var(--brand-accent)" />
   </svg>
 );
+
+const WilayatCard = ({ wilayat, prevTotal, theme }: any) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const growth = ((wilayat.total - prevTotal) / prevTotal * 100).toFixed(1);
+  const growthValue = parseFloat(growth);
+
+  return (
+    <motion.div 
+      layout
+      className={`card-polish border ${isExpanded ? 'border-[var(--brand-primary)] ring-4 ring-[var(--brand-primary)]/5' : 'border-[var(--border-ui)]'} bg-white group transition-all duration-300 overflow-hidden rounded-2xl`}
+    >
+      <div className="p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 flex items-center justify-center rounded-xl font-black text-sm transition-colors ${isExpanded ? 'bg-[var(--brand-primary)] text-white' : 'bg-slate-50 text-[var(--brand-primary)] group-hover:bg-[var(--brand-primary)] group-hover:text-white'}`}>
+             {wilayat.name.charAt(0)}
+          </div>
+          <div>
+            <h4 className={`font-black text-sm text-[var(--text-main)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>{wilayat.name}</h4>
+             <div className="flex items-center gap-1.5 mt-0.5">
+               <div className={`w-1.5 h-1.5 rounded-full ${growthValue > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+               <span className="text-[10px] font-black text-slate-400">نمو {growth}%</span>
+             </div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <div className="text-right hidden sm:block">
+            <div className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السكان 2025</div>
+            <div className="text-xs font-black text-[var(--brand-primary)]">{(wilayat.total).toLocaleString()}</div>
+          </div>
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className={`p-2 rounded-lg transition-all ${isExpanded ? 'bg-[var(--brand-primary)] text-white rotate-180' : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
+          >
+            <ChevronDown size={16} strokeWidth={3} />
+          </button>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="border-t border-[var(--border-ui)] bg-slate-50/50"
+          >
+             <div className="p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                   <div className="p-3 bg-white rounded-xl border border-slate-100 shadow-sm">
+                      <div className="text-[9px] font-black text-slate-400 uppercase mb-1">توزيع الجنسية</div>
+                      <div className="flex h-1.5 rounded-full overflow-hidden bg-slate-100 mb-2">
+                         <div className="h-full bg-blue-600" style={{ width: `${(wilayat.omani / wilayat.total * 100)}%` }}></div>
+                         <div className="h-full bg-red-600" style={{ width: `${(wilayat.expat / wilayat.total * 100)}%` }}></div>
+                      </div>
+                      <div className="flex justify-between text-[10px] font-black">
+                         <span className="text-blue-700">عماني: {((wilayat.omani / wilayat.total) * 100).toFixed(0)}%</span>
+                         <span className="text-red-700">وافد: {((wilayat.expat / wilayat.total) * 100).toFixed(0)}%</span>
+                      </div>
+                   </div>
+                   <div className="p-3 bg-white rounded-xl border border-slate-100 shadow-sm">
+                      <div className="text-[9px] font-black text-slate-400 uppercase mb-1">توزيع النوع</div>
+                      <div className="flex h-1.5 rounded-full overflow-hidden bg-slate-100 mb-2">
+                         <div className="h-full bg-[var(--brand-primary)]" style={{ width: `${(wilayat.male / wilayat.total * 100)}%` }}></div>
+                         <div className="h-full bg-[var(--brand-accent)]" style={{ width: `${(wilayat.female / wilayat.total * 100)}%` }}></div>
+                      </div>
+                      <div className="flex justify-between text-[10px] font-black">
+                         <span className="text-[var(--brand-primary)]">ذكور: {((wilayat.male / wilayat.total) * 100).toFixed(0)}%</span>
+                         <span className="text-[var(--brand-accent)]">إناث: {((wilayat.female / wilayat.total) * 100).toFixed(0)}%</span>
+                      </div>
+                   </div>
+                </div>
+                
+                <div className="bg-[var(--brand-primary)]/5 p-3 rounded-xl border border-[var(--brand-primary)]/10 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                      <TrendingUp size={14} className="text-[var(--brand-primary)]" />
+                      <span className="text-[10px] font-black text-[var(--brand-primary)]">صافي الزيادة السنوية:</span>
+                   </div>
+                   <span className="text-[12px] font-black text-[var(--brand-primary)]">+{(wilayat.total - prevTotal).toLocaleString()} نسمة</span>
+                </div>
+             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 const DemographicComparison = ({ wilayat1, wilayat2, data }) => {
   const w1 = data.wilayats.find(w => w.name === wilayat1);
@@ -326,27 +415,48 @@ const DATA_2025 = {
 
 // --- Components ---
 
-const StatCard = ({ title, value, subValue, icon: Icon, trend, color }) => (
+const StatCard = ({ title, value, subValue, icon: Icon, trend, color }: { title: any, value: any, subValue?: any, icon: any, trend?: any, color: any }) => (
   <motion.div 
-    whileHover={{ y: -5 }}
-    className="bg-white/90 backdrop-blur-sm border-b-4 p-6 rounded-2xl shadow-xl flex flex-col justify-between"
-    style={{ borderColor: color }}
+    whileHover={{ 
+      y: -8,
+      scale: 1.02,
+      borderColor: color,
+      backgroundColor: `rgba(${color.startsWith('var') ? 'var(--brand-primary-rgb, 15, 23, 42)' : '248, 250, 252'}, 0.02)`,
+      boxShadow: "0 25px 30px -10px rgba(0, 0, 0, 0.15), 0 15px 15px -10px rgba(0, 0, 0, 0.05)"
+    }}
+    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    className="bg-white/95 backdrop-blur-md border-2 border-slate-100 border-b-4 p-6 rounded-2xl shadow-xl flex flex-col justify-between transition-colors duration-500 h-full overflow-hidden relative"
+    style={{ borderBottomColor: color }}
   >
-    <div className="flex justify-between items-start">
-      <div className="p-3 rounded-xl bg-emerald-50 text-emerald-700">
-        <Icon size={24} />
+    {/* Subtle Glow Effect on Hover */}
+    <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500" style={{ backgroundColor: color, filter: 'blur(40px)' }}></div>
+    
+    <div className="flex justify-between items-start relative z-10">
+      <div className="p-3 rounded-xl bg-slate-50/80 shadow-sm" style={{ color }}>
+        <Icon size={20} strokeWidth={2.5} />
       </div>
       {trend !== undefined && (
-        <div className={`flex items-center text-sm font-bold ${trend > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-          {trend > 0 ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-          {Math.abs(trend)}%
+        <div className={`flex items-center px-2.5 py-1 rounded-full text-[10px] font-black ${trend > 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+          {trend > 0 ? <ArrowUpRight size={12} strokeWidth={4} /> : <ArrowDownRight size={12} strokeWidth={4} />}
+          <span className="ml-0.5">{Math.abs(trend)}%</span>
         </div>
       )}
     </div>
-    <div className="mt-4">
-      <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
-      <p className="text-3xl font-bold text-gray-900 tabular-nums">{value?.toLocaleString() ?? '0'}</p>
-      {subValue && <p className="text-xs text-gray-400 mt-1">{subValue}</p>}
+    <div className="mt-6 relative z-10">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-4 h-[1px] opacity-20" style={{ backgroundColor: color }}></div>
+        <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] leading-none shrink-0">{title}</h3>
+        <Icon size={10} className="opacity-30" style={{ color }} />
+      </div>
+      <p className="text-[42px] font-black text-slate-900 tabular-nums tracking-tighter leading-none">
+        {typeof value === 'number' ? value.toLocaleString() : value}
+      </p>
+      {subValue && (
+        <div className="flex items-center gap-2 mt-3 p-1.5 px-2 bg-slate-50/50 rounded-lg w-fit border border-slate-100/50">
+          <div className="w-1.5 h-1.5 rounded-full shadow-sm" style={{ backgroundColor: color }}></div>
+          <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest leading-none">{subValue}</p>
+        </div>
+      )}
     </div>
   </motion.div>
 );
@@ -859,7 +969,6 @@ export default function App() {
                             <div className="flex items-center gap-3 mb-2">
                                <div className={`w-3 h-3 rounded-full ${item.color} shadow-sm animate-pulse`}></div>
                                <span className="text-sm font-black text-slate-800">{item.label}</span>
-                               <span className="mr-auto text-sm font-black text-[var(--brand-primary)]">{item.percent}%</span>
                             </div>
                             <p className="text-[10px] text-slate-400 font-bold leading-relaxed mb-1">{item.desc}</p>
                             <div className="text-[12px] font-black text-slate-600">{item.count.toLocaleString()} نسمة</div>
@@ -923,34 +1032,35 @@ export default function App() {
             >
               {/* Summary KPIs Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="card-polish p-5 card-shadow border-t-4 border-[var(--brand-primary)] bg-white/80">
-                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">إجمالي السكان 2024</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-[var(--brand-primary)]">{DATA_2024.total.toLocaleString()}</span>
-                    <span className="text-[10px] font-bold opacity-60">نسمة</span>
-                  </div>
-                </div>
-                <div className="card-polish p-5 card-shadow border-t-4 border-[var(--brand-primary)] bg-white/80">
-                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">إجمالي السكان 2025</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-[var(--brand-primary)]">{DATA_2025.total.toLocaleString()}</span>
-                    <span className="text-[10px] font-bold opacity-60">نسمة</span>
-                  </div>
-                </div>
-                <div className="card-polish p-5 card-shadow border-t-4 border-emerald-500 bg-white/80">
-                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">الزيادة العددية</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-emerald-600">+{ (DATA_2025.total - DATA_2024.total).toLocaleString() }</span>
-                    <TrendingUp size={14} className="text-emerald-500" />
-                  </div>
-                </div>
-                <div className="card-polish p-5 card-shadow border-t-4 border-[var(--brand-accent)] bg-white/80">
-                  <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider block mb-1">معدل النمو السنوي</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-[var(--brand-accent)]">0.55%</span>
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  </div>
-                </div>
+                <StatCard 
+                  title="إجمالي السكان 2024" 
+                  value={DATA_2024.total} 
+                  subValue="إحصاء رسمي" 
+                  icon={Users} 
+                  color="var(--brand-primary)" 
+                />
+                <StatCard 
+                  title="إجمالي السكان 2025" 
+                  value={DATA_2025.total} 
+                  subValue="تقديرات ديموغرافية" 
+                  icon={Users} 
+                  color="var(--brand-primary)" 
+                />
+                <StatCard 
+                  title="الزيادة العددية" 
+                  value={DATA_2025.total - DATA_2024.total} 
+                  subValue="خلال عام واحد" 
+                  icon={TrendingUp} 
+                  trend={0.55} 
+                  color="#10b981" 
+                />
+                <StatCard 
+                  title="معدل النمو السنوي" 
+                  value="0.55%" 
+                  subValue="نسبة الزيادة السنوية" 
+                  icon={Activity} 
+                  color="var(--brand-accent)" 
+                />
               </div>
 
               {/* Main Visualizations Row */}
@@ -1043,32 +1153,20 @@ export default function App() {
               {/* Top 5 Growth Wilayats & Insights */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="card-polish p-6 card-shadow lg:col-span-1">
-                  <h3 className={`text-lg font-black text-[var(--brand-primary)] mb-4 ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>أبرز الولايات نمواً للسكان</h3>
-                  <div className="space-y-3">
+                  <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-3">
+                    <h3 className={`text-lg font-black text-[var(--brand-primary)] ${theme === 'royal' ? 'font-serif' : 'font-sans'}`}>أبرز الولايات نمواً للسكان</h3>
+                    <TrendingUp size={18} className="text-emerald-500" />
+                  </div>
+                  <div className="space-y-4">
                     {[...DATA_2025.wilayats]
                       .map(w => {
                         const prev = DATA_2024.wilayats.find(p => p.name === w.name);
-                        const growth = prev ? ((w.total - prev.total) / prev.total * 100).toFixed(1) : '0';
-                        return { name: w.name, growth: parseFloat(growth), current: w.total, prev: prev?.total || 1 };
+                        return { data: w, prevTotal: prev?.total || 1, growth: prev ? ((w.total - prev.total) / prev.total * 100) : 0 };
                       })
                       .sort((a, b) => b.growth - a.growth)
                       .slice(0, 5)
-                      .map((w, idx) => (
-                        <div key={w.name} className="flex items-center justify-between p-3 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-ui)]">
-                          <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 flex items-center justify-center bg-[var(--brand-primary)] text-white rounded-full text-xs font-black">{idx + 1}</span>
-                            <span className="font-bold text-[var(--text-main)] text-xs italic">{w.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-right">
-                              <div className="text-[8px] text-[var(--text-muted)] font-bold">الزيادة</div>
-                              <div className="text-[10px] font-black text-emerald-600">+{ (w.current - w.prev).toLocaleString() }</div>
-                            </div>
-                            <div className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-lg text-[10px] font-black">
-                              {w.growth}%
-                            </div>
-                          </div>
-                        </div>
+                      .map((w) => (
+                        <WilayatCard key={w.data.name} wilayat={w.data} prevTotal={w.prevTotal} theme={theme} />
                       ))}
                   </div>
                 </div>
